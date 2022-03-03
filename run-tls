@@ -1,0 +1,4 @@
+#!/bin/bash
+
+uvicorn server:app --ssl-certfile server.crt --ssl-keyfile server.key --port 4433 --host 0.0.0.0 --no-server-header --reload
+
