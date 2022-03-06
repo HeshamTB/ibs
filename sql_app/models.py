@@ -12,7 +12,7 @@ class User(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
 
-    items = relationship("Item", back_populates="owner")
+    #items = relationship("Item", back_populates="owner")
 
 
 class IotEntity(Base):
@@ -20,6 +20,6 @@ class IotEntity(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("user_accounts.id"))
 
-    owner = relationship("User", back_populates="items")
+    #owner = relationship("User", back_populates="items")

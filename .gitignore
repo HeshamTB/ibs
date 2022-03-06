@@ -4,3 +4,4 @@ server.key
 server.orig.key
 __pycache__
 venv/
+*.db
