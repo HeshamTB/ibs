@@ -10,9 +10,10 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    passwd_salt = Column(String)
     is_active = Column(Boolean, default=True)
 
-    #items = relationship("Item", back_populates="owner")
+    authorized_devices = relationship("IotEntity", secondary= 'user_iot_link')
 
 
 class IotEntity(Base):
@@ -22,4 +23,10 @@ class IotEntity(Base):
     description = Column(String, index=True)
     owner_id = Column(Integer, ForeignKey("user_accounts.id"))
 
-    #owner = relationship("User", back_populates="items")
+    authorized_users = relationship("User", secondary= 'user_iot_link')
+
+class UserAuthToIoTDev(Base):
+    __tablename__ = "user_iot_link"
+
+    user_id = Column(Integer, ForeignKey('iot_entities.id'), primary_key=True, index=True)
+    iot_entity_id = Column(Integer, ForeignKey('user_accounts.id'), primary_key=True, index=True)
