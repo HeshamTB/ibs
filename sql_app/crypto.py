@@ -13,11 +13,12 @@ def get_new_salt(n_bytes : int = 32) -> bytes:
     
     return os.urandom(n_bytes)
 
-"""
-Generate a new key and salt to store.
-Returns (key, salt)
-"""
+
 def gen_new_key(plain_passwd : str) -> tuple:
+    """
+    Generate a new key and salt to store.
+    Returns (key, salt)
+    """
     salt = get_new_salt(32)
     return (calc_key(plain_passwd, salt), salt)
 
