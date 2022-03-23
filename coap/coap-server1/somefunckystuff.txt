@@ -1,0 +1,2 @@
+https://stackoverflow.com/questions/840501/how-do-function-pointers-in-c-work
+https://stackoverflow.com/questions/3674200/what-does-a-typedef-with-parenthesis-like-typedef-int-fvoid-mean-is-it-a
