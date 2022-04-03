@@ -28,5 +28,5 @@ class IotEntity(Base):
 class UserAuthToIoTDev(Base):
     __tablename__ = "user_iot_link"
 
-    user_id = Column(Integer, ForeignKey('iot_entities.id'), primary_key=True, index=True)
-    iot_entity_id = Column(Integer, ForeignKey('user_accounts.id'), primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('user_accounts.id'), primary_key=True, index=True)
+    iot_entity_id = Column(Integer, ForeignKey('iot_entities.id'), primary_key=True, index=True)
