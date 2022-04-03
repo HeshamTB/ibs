@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -31,7 +31,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    authorized_devices: list[IotEntity] = []
+    authorized_devices: List[IotEntity] = []
 
     class Config:
         orm_mode = True
