@@ -1,4 +1,4 @@
 #!/bin/bash
 
-uvicorn server:app --ssl-certfile server.crt --ssl-keyfile server.key --port 4433 --host 0.0.0.0 --no-server-header --reload
-
+source venv/bin/activate
+uvicorn sql_app.main:app --ssl-certfile server.crt --ssl-keyfile server.key --port 4433 --host 0.0.0.0 --no-server-header

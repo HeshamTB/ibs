@@ -22,6 +22,7 @@ class IotEntity(IotEntityBase):
 
 class UserBase(BaseModel):
     email: str
+    username: str
 
 
 class UserCreate(UserBase):
