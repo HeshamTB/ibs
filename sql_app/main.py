@@ -86,20 +86,46 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+# Add admin, disable user, activeate user
 @app.post("/admin/users/{user_id}/allow/{iot_entity_id}", tags=['Admin'])
 def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
     iot_entity = crud.get_iot_entity(db, request.iot_entity_id)
     if not iot_entity:
         raise HTTPException(status_code=404, detail="Iot Entity not found")
-    
+
     res = crud.create_user_link_to_iot(db, request.user_id, request.iot_entity_id)
     if not res:
         raise HTTPException(status_code=500, detail="Could not complete operation")
 
+    return
+
+@app.post("/admin/users/{user_id}/disallow/{iot_entity_id}", tags=['Admin'])
+def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db: Session = Depends(get_db)):
+    user = crud.get_user(db, request.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    iot_entity = crud.get_iot_entity(db, request.iot_entity_id)
+    if not iot_entity:
+        raise HTTPException(status_code=404, detail="Iot Entity not found")
+
+    #res = crud.create_user_link_to_iot(db, request.user_id, request.iot_entity_id)
+    # Implement remove link
+    if not res:
+        raise HTTPException(status_code=500, detail="Could not complete operation")
+
+    return
+
+@app.post("/admin/users/{user_id}/deactiveate", tags=['Admin'])
+def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
+    return
+
+@app.post("/admin/users/{user_id}/activeate", tags=['Admin'])
+def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
     return
 
 @app.get("/users/acesslist/", response_model=List[schemas.IotEntity], tags=['Users'])
