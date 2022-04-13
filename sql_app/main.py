@@ -48,7 +48,7 @@ async def get_current_active_user(current_user: schemas.User = Depends(get_curre
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
-@app.post("/users/reg", response_model=schemas.User, tags=['users'])
+@app.post("/users/reg", response_model=schemas.User, tags=['Users'])
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -61,13 +61,17 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@app.get("/users/", response_model=List[schemas.User])
+@app.get("/admin/users/", response_model=List[schemas.User], tags=['Admin'])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
 
+@app.get("/admin/iotentities/", response_model=List[schemas.IotEntity], tags=['Admin'])
+def read_iot_entities(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    iot_entities = crud.get_iot_entities(db, skip=skip, limit=limit)
+    return iot_entities
 
-@app.get("/users/{user_id}", response_model=schemas.User)
+@app.get("/admin/users/{user_id}", response_model=schemas.User, tags=['Admin'])
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
@@ -75,19 +79,13 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.post("/users/{user_id}/items/", response_model=schemas.IotEntity)
-def create_item_for_user(
-    user_id: int, item: schemas.IotEntityCreate, db: Session = Depends(get_db)
-):
-    return crud.create_user_item(db=db, item=item, user_id=user_id)
+@app.get("/users/acesslist/", response_model=List[schemas.IotEntity], tags=['Users'])
+def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_active_user)):
+    user = crud.get_user_by_username(db, current_user.username)
+    return user.authorized_devices
 
 
-@app.get("/items", response_model=List[schemas.IotEntity])
-def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    items = crud.get_items(db, skip=skip, limit=limit)
-    return items
-
-@app.post("/tkn", response_model=schemas.Token)
+@app.post("/tkn", response_model=schemas.Token, tags=['Users'])
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth_helper.authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -102,8 +100,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/users/me/", response_model=schemas.User)
-async def read_users_me(current_user: schemas.User = Depends(get_current_active_user)):
+@app.get("/users/me/", response_model=schemas.User, tags=['Users'])
+async def get_user_details(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
 
 
