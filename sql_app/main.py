@@ -74,6 +74,11 @@ def read_iot_entities(skip: int = 0, limit: int = 100, db: Session = Depends(get
     iot_entities = crud.get_iot_entities(db, skip=skip, limit=limit)
     return iot_entities
 
+@app.post("/admin/iotentities/create", response_model=schemas.IotEntity, tags=['Admin'])
+def create_iot_entities(iot_entity: schemas.IotEntityCreate, db: Session = Depends(get_db)):
+    iot_entities = crud.create_iot_entity(db, iot_entity)
+    return iot_entities
+
 @app.get("/admin/users/{user_id}", response_model=schemas.User, tags=['Admin'])
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
@@ -81,12 +86,26 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+@app.post("/admin/users/{user_id}/allow/{iot_entity_id}", tags=['Admin'])
+def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db: Session = Depends(get_db)):
+    user = crud.get_user(db, request.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    iot_entity = crud.get_iot_entity(db, request.iot_entity_id)
+    if not iot_entity:
+        raise HTTPException(status_code=404, detail="Iot Entity not found")
+    
+    res = crud.create_user_link_to_iot(db, request.user_id, request.iot_entity_id)
+    if not res:
+        raise HTTPException(status_code=500, detail="Could not complete operation")
+
+    return
 
 @app.get("/users/acesslist/", response_model=List[schemas.IotEntity], tags=['Users'])
 def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_active_user)):
     user = crud.get_user_by_username(db, current_user.username)
     return user.authorized_devices
-
 
 @app.post("/tkn", response_model=schemas.Token, tags=['Users'])
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

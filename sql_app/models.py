@@ -22,7 +22,6 @@ class IotEntity(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("user_accounts.id"))
 
     authorized_users = relationship("User", secondary= 'user_iot_link')
 

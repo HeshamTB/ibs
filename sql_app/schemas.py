@@ -7,27 +7,24 @@ class IotEntityBase(BaseModel):
     id: int
     description: str
 
+class UserBase(BaseModel):
+    email: str
+    username: str
 
 class IotEntityCreate(IotEntityBase):
     pass
 
 
-class IotEntity(IotEntityBase):
-    id: int
-    description: str
-
-    class Config:
-        orm_mode = True
-
-
-class UserBase(BaseModel):
-    email: str
-    username: str
-
-
 class UserCreate(UserBase):
     password: str
 
+
+class IotEntity(IotEntityBase):
+    id: int
+    description: str
+    #authorized_users: List[User] = []
+    class Config:
+        orm_mode = True
 
 class User(UserBase):
     id: int
@@ -37,6 +34,7 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+
 class Token(BaseModel):
     access_token : str
     token_type : str
@@ -45,3 +43,7 @@ class TokenData(BaseModel):
     username : str
     # Token can conatin information. But we are already recording this in a database
     # for scalability. 
+
+class UserAllowForIotEntityRequest(BaseModel):
+    user_id: int
+    iot_entity_id: int
