@@ -11,6 +11,9 @@ def get_user(db: Session, user_id: int):
 def get_iot_entity(db: Session, id: int):
     return db.query(models.IotEntity).filter(models.IotEntity.id == id).first()
 
+def get_iot_entity_by_description(db: Session, description: str):
+    return db.query(models.IotEntity).filter(models.IotEntity.description == description).first()
+
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 

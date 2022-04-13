@@ -44,6 +44,10 @@ class TokenData(BaseModel):
     # Token can conatin information. But we are already recording this in a database
     # for scalability. 
 
-class UserAllowForIotEntityRequest(BaseModel):
+class UserAllowForIotEntityRequestByID(BaseModel):
     user_id: int
     iot_entity_id: int
+
+class UserAllowForIotEntityRequestByUsername(BaseModel):
+    username: str
+    description: str

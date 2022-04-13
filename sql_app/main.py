@@ -74,6 +74,7 @@ def read_iot_entities(skip: int = 0, limit: int = 100, db: Session = Depends(get
     iot_entities = crud.get_iot_entities(db, skip=skip, limit=limit)
     return iot_entities
 
+# TODO: Can duplicate
 @app.post("/admin/iotentities/create", response_model=schemas.IotEntity, tags=['Admin'])
 def create_iot_entities(iot_entity: schemas.IotEntityCreate, db: Session = Depends(get_db)):
     iot_entities = crud.create_iot_entity(db, iot_entity)
@@ -86,9 +87,9 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-# Add admin, disable user, activeate user
-@app.post("/admin/users/allowdevice/", tags=['Admin'])
-def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db: Session = Depends(get_db)):
+# TODO: Can duplicate
+@app.post("/admin/users/allowdevice/id", tags=['Admin'])
+def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -101,10 +102,10 @@ def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db:
     if not res:
         raise HTTPException(status_code=500, detail="Could not complete operation")
 
-    return
+    return user
 
-@app.post("/admin/users/disallowdevice/", tags=['Admin'])
-def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db: Session = Depends(get_db)):
+@app.post("/admin/users/disallowdevice/id", tags=['Admin'])
+def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -115,6 +116,22 @@ def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db:
 
     #res = crud.create_user_link_to_iot(db, request.user_id, request.iot_entity_id)
     # Implement remove link
+    if not res:
+        raise HTTPException(status_code=500, detail="Could not complete operation")
+
+    return
+
+@app.post("/admin/users/allowdevice/name", tags=['Admin'])
+def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequestByUsername, db: Session = Depends(get_db)):
+    user = crud.get_user_by_username(db, request.username)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    iot_entity = crud.get_iot_entity_by_description(db, request.description)
+    if not iot_entity:
+        raise HTTPException(status_code=404, detail="Iot Entity not found")
+
+    res = crud.create_user_link_to_iot(db, user.id, iot_entity.id)
     if not res:
         raise HTTPException(status_code=500, detail="Could not complete operation")
 
