@@ -87,7 +87,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 # Add admin, disable user, activeate user
-@app.post("/admin/users/{user_id}/allow/{iot_entity_id}", tags=['Admin'])
+@app.post("/admin/users/allowdevice/", tags=['Admin'])
 def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
@@ -103,7 +103,7 @@ def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db:
 
     return
 
-@app.post("/admin/users/{user_id}/disallow/{iot_entity_id}", tags=['Admin'])
+@app.post("/admin/users/disallowdevice/", tags=['Admin'])
 def allow_user_for_iot_entity(request: schemas.UserAllowForIotEntityRequest, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
