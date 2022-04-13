@@ -60,6 +60,9 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         
     return crud.create_user(db=db, user=user)
 
+@app.get("/users/me/", response_model=schemas.User, tags=['Users'])
+async def get_user_details(current_user: schemas.User = Depends(get_current_active_user)):
+    return current_user
 
 @app.get("/admin/users/", response_model=List[schemas.User], tags=['Admin'])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
@@ -99,10 +102,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": form_data.username}, expires_delta=timedelta(minutes=15)
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-@app.get("/users/me/", response_model=schemas.User, tags=['Users'])
-async def get_user_details(current_user: schemas.User = Depends(get_current_active_user)):
-    return current_user
 
 
 
