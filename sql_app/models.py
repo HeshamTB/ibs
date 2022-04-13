@@ -8,11 +8,11 @@ class User(Base):
     __tablename__ = "user_accounts"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String) # TODO: make not null
-    passwd_salt = Column(String)
-    is_active = Column(Boolean, default=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    passwd_salt = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=False)
 
     authorized_devices = relationship("IotEntity", secondary= 'user_iot_link')
 
@@ -21,8 +21,8 @@ class IotEntity(Base):
     __tablename__ = "iot_entities"
 
     id = Column(Integer, primary_key=True, index=True)
-    bluetooth_mac = Column(String)
-    description = Column(String, index=True)
+    bluetooth_mac = Column(String(512))
+    description = Column(String(512))
 
     authorized_users = relationship("User", secondary= 'user_iot_link')
 
