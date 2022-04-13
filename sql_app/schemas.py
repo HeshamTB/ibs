@@ -36,3 +36,12 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+class Token(BaseModel):
+    access_token : str
+    token_type : str
+
+class TokenData(BaseModel):
+    username : str
+    # Token can conatin information. But we are already recording this in a database
+    # for scalability. 

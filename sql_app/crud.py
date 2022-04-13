@@ -2,7 +2,7 @@
 
 from sqlalchemy.orm import Session
 
-from . import models, schemas, crypto
+from . import models, schemas, crypto, auth_helper
 
 
 def get_user(db: Session, user_id: int):
