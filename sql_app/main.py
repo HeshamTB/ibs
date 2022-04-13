@@ -24,7 +24,7 @@ def get_db():
     finally:
         db.close()
 
-async def get_current_user(token: str = Depends(oauth), db: Session = Depends(get_db)):
+def get_current_user(token: str = Depends(oauth), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -43,7 +43,7 @@ async def get_current_user(token: str = Depends(oauth), db: Session = Depends(ge
         raise credentials_exception
     return user
 
-async def get_current_active_user(current_user: schemas.User = Depends(get_current_user)):
+def get_current_active_user(current_user: schemas.User = Depends(get_current_user)):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -61,7 +61,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 @app.get("/users/me/", response_model=schemas.User, tags=['Users'])
-async def get_user_details(current_user: schemas.User = Depends(get_current_active_user)):
+def get_user_details(current_user: schemas.User = Depends(get_current_active_user)):
     return current_user
 
 @app.get("/admin/users/", response_model=List[schemas.User], tags=['Admin'])
@@ -134,7 +134,7 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     return user.authorized_devices
 
 @app.post("/tkn", response_model=schemas.Token, tags=['Users'])
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth_helper.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
