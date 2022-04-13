@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class IotEntityBase(BaseModel):
-    id: int
+    bluetooth_mac: str
     description: str
 
 class UserBase(BaseModel):
@@ -18,10 +18,10 @@ class IotEntityCreate(IotEntityBase):
 class UserCreate(UserBase):
     password: str
 
-
 class IotEntity(IotEntityBase):
     id: int
     description: str
+    bluetooth_mac: str
     #authorized_users: List[User] = []
     class Config:
         orm_mode = True

@@ -36,7 +36,8 @@ def get_iot_entities(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_iot_entity(db: Session, iot_entity: schemas.IotEntityCreate):
-    db_item = models.IotEntity(id=iot_entity.id, description=iot_entity.description)
+    db_item = models.IotEntity(bluetooth_mac=iot_entity.bluetooth_mac,
+                               description=iot_entity.description)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

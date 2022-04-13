@@ -21,6 +21,7 @@ class IotEntity(Base):
     __tablename__ = "iot_entities"
 
     id = Column(Integer, primary_key=True, index=True)
+    bluetooth_mac = Column(String)
     description = Column(String, index=True)
 
     authorized_users = relationship("User", secondary= 'user_iot_link')
