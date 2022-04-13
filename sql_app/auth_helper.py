@@ -27,8 +27,8 @@ def create_access_token(data : dict, expires_delta : Optional[timedelta] = None)
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGO)
     return encoded_jwt
 
-def authenticate_user(db: Session, email : str, password : str):
-    user = crud.get_user_by_email(db=db, email=email)
+def authenticate_user(db: Session, username : str, password : str):
+    user = crud.get_user_by_username(db, username)
     if not user:
         return False
     return crypto.verify_key(password, user.passwd_salt, user.hashed_password)
