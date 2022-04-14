@@ -1,0 +1,13 @@
+- [ ] Redesign database
+- [ ] Define mergancy triggers (manual and automatic)
+- [ ] Expose temporary control in case of emergancy
+        - Triggers
+        - Acccess
+        - Resolve (revoke access)
+- [ ] Temporal door open commands (Needs door state to operate efficiatly)
+        - Open for 1H
+        - Open to 1:30PM
+        - Set schedual
+- [ ] Issue door open command
+- [ ] Make functions to gen a IotEntity token
+- [ ] Save prefix of token to allow/revoke token??
