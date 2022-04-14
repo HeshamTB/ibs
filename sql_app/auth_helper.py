@@ -3,8 +3,9 @@ from typing import Optional
 from decouple import config
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from fastapi import Depends
+from fastapi import Depends, Security, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security.api_key import APIKey, APIKeyHeader
 from . import crud, crypto, schemas
 import jwt
 
@@ -14,7 +15,10 @@ import time
 JWT_SECRET = config('jwt_secret')
 JWT_ALGO = config('jwt_algorithm')
 
+__API_KEY = config('API_KEY')
+__API_KEY_NAME = config('API_KEY_NAME')
 
+api_key_header = APIKeyHeader(name=__API_KEY_NAME)
 
 def create_access_token(data : dict, expires_delta : Optional[timedelta] = None):
     # TODO: Consider making non-expiring token
@@ -33,3 +37,7 @@ def authenticate_user(db: Session, username : str, password : str):
         return False
     return crypto.verify_key(password, user.passwd_salt, user.hashed_password)
 
+def valid_api_key(key = Security(api_key_header)):
+    if not __API_KEY == key:
+        raise HTTPException(401, detail="invalid key")
+    return 
