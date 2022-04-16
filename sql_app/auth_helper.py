@@ -40,4 +40,9 @@ def authenticate_user(db: Session, username : str, password : str):
 def valid_api_key(key = Security(api_key_header)):
     if not __API_KEY == key:
         raise HTTPException(401, detail="invalid key")
-    return 
+    return
+
+def create_iot_dev_token(data: dict):
+    to_encode = data.copy()
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGO)
+    return encoded_jwt

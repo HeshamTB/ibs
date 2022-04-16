@@ -1,5 +1,5 @@
 - [ ] Redesign database
-- [ ] Define mergancy triggers (manual and automatic)
+- [ ] Define emrgancy triggers (manual and automatic)
 - [ ] Expose temporary control in case of emergancy
         - Triggers
         - Acccess
