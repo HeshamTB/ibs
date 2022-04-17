@@ -8,6 +8,6 @@
         - Open for 1H
         - Open to 1:30PM
         - Set schedual
-- [ ] Issue door open command
-- [ ] Make functions to gen a IotEntity token
+- [X] Issue door open command
+- [X] Make functions to gen a IotEntity token
 - [ ] Save prefix of token to allow/revoke token??

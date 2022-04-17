@@ -23,6 +23,7 @@ class IotEntity(IotEntityBase):
     description: str
     bluetooth_mac: str
     #authorized_users: List[User] = []
+    open_request: bool # Flag to open
     class Config:
         orm_mode = True
 
@@ -54,3 +55,10 @@ class UserAllowForIotEntityRequestByID(BaseModel):
 class UserAllowForIotEntityRequestByUsername(BaseModel):
     username: str
     description: str
+
+class OpenDoorRequestBase(BaseModel):
+    username: str
+    bluetooth_mac: str
+
+class OpenDoorRequestTime(OpenDoorRequestBase):
+    time_minutes: int

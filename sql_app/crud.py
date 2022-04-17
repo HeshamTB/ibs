@@ -4,6 +4,11 @@ from sqlalchemy.orm import Session
 
 from . import models, schemas, crypto, auth_helper
 
+# TODO: Data we can collect or log
+#  - Last user connection (link to user)
+#  - Last Iot Entity Connection (link to IotEntity)
+#  - Any open request (link to user)
+#  - Any polling from IotEntity? Maybe to much data
 
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
@@ -55,4 +60,10 @@ def create_user_link_to_iot(db: Session, user_id: int, iot_dev_id: int):
     db.add(new_link)
     db.commit()
     db.refresh(new_link)
+    return True
+
+def set_open_door_request(db: Session, iot_entity_id: int):
+    device = get_iot_entity(db, iot_entity_id)
+    setattr(device, "open_request", True)    
+    db.refresh(device)
     return True

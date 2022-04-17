@@ -23,7 +23,7 @@ class IotEntity(Base):
     id = Column(Integer, primary_key=True, index=True)
     bluetooth_mac = Column(String(512))
     description = Column(String(512))
-
+    open_request = Column(Boolean, default=False)
     authorized_users = relationship("User", secondary= 'user_iot_link')
 
 class UserAuthToIoTDev(Base):

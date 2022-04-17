@@ -173,6 +173,22 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     user = crud.get_user_by_username(db, current_user.username)
     return user.authorized_devices
 
+@app.post("/users/open",tags=['Users'])
+def issue_open_door_command(command: schemas.OpenDoorRequestBase, 
+                            db: Session = Depends(get_db),
+                            current_user: schemas.User = Depends(get_current_active_user)):
+    err = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                  detail="Unauthrized to open")
+    device = crud.get_iot_entity_by_bluetooth_mac(db, command.bluetooth_mac)
+    if not device: raise err
+    # TODO: Use database search rather then this linear search
+    user = crud.get_user(db, current_user.id)
+    for dev in user.authorized_devices:
+        if dev.bluetooth_mac == device.bluetooth_mac:
+            crud.set_open_door_request(db, device.id)
+            return device
+    raise err
+
 @app.post("/users/tkn", response_model=schemas.Token, tags=['Users'])
 @app.post("/tkn", response_model=schemas.Token, tags=['Users'])
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
