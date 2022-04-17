@@ -49,6 +49,19 @@ def get_current_active_user(current_user: schemas.User = Depends(get_current_use
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
+def get_current_iot_device(current_device: schemas.IotBluetoothMac = Depends(),
+                           token: str = Depends(oauth),
+                           db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    payload = jwt.decode(token, auth_helper.JWT_SECRET, algorithms=[auth_helper.JWT_ALGO])
+    mac_signed = payload.get("bluetooth_mac")
+    if (mac_signed == current_device): return mac_signed
+    else: raise credentials_exception
+
 @app.post("/users/reg", response_model=schemas.User, tags=['Users'])
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
@@ -145,6 +158,14 @@ def deactiveate_user(user_id: int, db:Session = Depends(get_db), api_key: APIKey
 @app.post("/admin/users/{user_id}/activeate", tags=['Admin'])
 def deactiveate_user(user_id: int, db:Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
     return
+
+@app.post("/admin/iotdevice/gentoken/", response_model=schemas.Token, tags=['Admin'])
+def generate_token_for_iot_device(bluetooth_mac : schemas.IotBluetoothMac, 
+                                  api_key: APIKey = Depends(auth_helper.valid_api_key)):
+    # We get here after a valid admin key, so send back permenant token
+    data = {"bluetooth_mac": bluetooth_mac.bluetooth_mac}
+    tkn = auth_helper.create_iot_dev_token(data)
+    return {"access_token": tkn, "token_type": "bearer"}
 
 @app.get("/users/acesslist/", response_model=List[schemas.IotEntity], tags=['Users'])
 def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_active_user)):

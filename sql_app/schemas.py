@@ -26,6 +26,9 @@ class IotEntity(IotEntityBase):
     class Config:
         orm_mode = True
 
+class IotBluetoothMac(BaseModel):
+    bluetooth_mac : str
+
 class User(UserBase):
     id: int
     is_active: bool
