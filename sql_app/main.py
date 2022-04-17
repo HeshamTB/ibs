@@ -59,8 +59,9 @@ def get_current_iot_device(current_device: schemas.IotBluetoothMac = Depends(),
     )
     payload = jwt.decode(token, auth_helper.JWT_SECRET, algorithms=[auth_helper.JWT_ALGO])
     mac_signed = payload.get("bluetooth_mac")
-    if (mac_signed == current_device): return mac_signed
-    else: raise credentials_exception
+    if (mac_signed != current_device): raise credentials_exception
+    device = crud.get_iot_entity_by_bluetooth_mac(db, mac_signed)
+    return device
 
 @app.post("/users/reg", response_model=schemas.User, tags=['Users'])
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
