@@ -173,6 +173,7 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     user = crud.get_user_by_username(db, current_user.username)
     return user.authorized_devices
 
+@app.post("/users/tkn", response_model=schemas.Token, tags=['Users'])
 @app.post("/tkn", response_model=schemas.Token, tags=['Users'])
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth_helper.authenticate_user(db, form_data.username, form_data.password)
