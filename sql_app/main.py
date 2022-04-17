@@ -102,7 +102,6 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-# TODO: Can duplicate
 @app.post("/admin/users/allowdevice/id", tags=['Admin'])
 def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
@@ -117,7 +116,7 @@ def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReques
     if not res:
         raise HTTPException(status_code=500, detail="Could not complete operation")
 
-    return user
+    return
 
 @app.post("/admin/users/disallowdevice/id", tags=['Admin'])
 def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
@@ -129,8 +128,7 @@ def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReq
     if not iot_entity:
         raise HTTPException(status_code=404, detail="Iot Entity not found")
 
-    #res = crud.create_user_link_to_iot(db, request.user_id, request.iot_entity_id)
-    # Implement remove link
+    res = crud.remove_user_link_to_iot(db, request.user_id, request.iot_entity_id)
     if not res:
         raise HTTPException(status_code=500, detail="Could not complete operation")
 
@@ -173,7 +171,7 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     user = crud.get_user_by_username(db, current_user.username)
     return user.authorized_devices
 
-@app.post("/users/open",tags=['Users'])
+@app.post("/users/open", tags=['Users'])
 def issue_open_door_command(command: schemas.OpenDoorRequestBase, 
                             db: Session = Depends(get_db),
                             current_user: schemas.User = Depends(get_current_active_user)):
