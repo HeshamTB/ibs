@@ -64,6 +64,8 @@ def create_user_link_to_iot(db: Session, user_id: int, iot_dev_id: int):
 
 def set_open_door_request(db: Session, iot_entity_id: int):
     device = get_iot_entity(db, iot_entity_id)
-    setattr(device, "open_request", True)    
+    setattr(device, "open_request", True)
+    db.add(device) 
+    db.commit()
     db.refresh(device)
     return True
