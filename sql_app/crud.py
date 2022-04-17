@@ -11,7 +11,7 @@ from . import models, schemas, crypto, auth_helper
 #  - Any polling from IotEntity? Maybe to much data
 
 def get_user(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    return db.query(models.User).get(user_id)
 
 def get_iot_entity(db: Session, id: int):
     return db.query(models.IotEntity).filter(models.IotEntity.id == id).first()
