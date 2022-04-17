@@ -80,23 +80,23 @@ def get_user_details(current_user: schemas.User = Depends(get_current_active_use
     return current_user
 
 @app.get("/admin/users/", response_model=List[schemas.User], tags=['Admin'])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
 
 @app.get("/admin/iotentities/", response_model=List[schemas.IotEntity], tags=['Admin'])
-def read_iot_entities(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def read_iot_entities(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     iot_entities = crud.get_iot_entities(db, skip=skip, limit=limit)
     return iot_entities
 
 # TODO: Can duplicate
 @app.post("/admin/iotentities/create", response_model=schemas.IotEntity, tags=['Admin'])
-def create_iot_entities(iot_entity: schemas.IotEntityCreate, db: Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def create_iot_entities(iot_entity: schemas.IotEntityCreate, db: Session = Depends(get_db)):
     iot_entities = crud.create_iot_entity(db, iot_entity)
     return iot_entities
 
 @app.get("/admin/users/{user_id}", response_model=schemas.User, tags=['Admin'])
-def read_user(user_id: int, db: Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -104,7 +104,7 @@ def read_user(user_id: int, db: Session = Depends(get_db), api_key: APIKey = Dep
 
 # TODO: Can duplicate
 @app.post("/admin/users/allowdevice/id", tags=['Admin'])
-def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -120,7 +120,7 @@ def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReques
     return user
 
 @app.post("/admin/users/disallowdevice/id", tags=['Admin'])
-def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -137,7 +137,7 @@ def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReq
     return
 
 @app.post("/admin/users/allowdevice/name", tags=['Admin'])
-def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequestByUsername, db: Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequestByUsername, db: Session = Depends(get_db)):
     user = crud.get_user_by_username(db, request.username)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -153,11 +153,11 @@ def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequ
     return
 
 @app.post("/admin/users/{user_id}/deactiveate", tags=['Admin'])
-def deactiveate_user(user_id: int, db:Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
     return
 
 @app.post("/admin/users/{user_id}/activeate", tags=['Admin'])
-def deactiveate_user(user_id: int, db:Session = Depends(get_db), api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
     return
 
 @app.post("/admin/iotdevice/gentoken/", response_model=schemas.Token, tags=['Admin'])
