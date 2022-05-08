@@ -77,6 +77,6 @@ class IotDoorPollingResponse(BaseModel):
 class IotMonitorRoomInfo(BaseModel):
     humidity : int
     people : int
-    tempreture : int
+    temperature : int
     smoke_sensor_reading : int
     token: str
