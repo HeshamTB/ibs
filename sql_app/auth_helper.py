@@ -46,3 +46,13 @@ def create_iot_dev_token(data: dict):
     to_encode = data.copy()
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGO)
     return encoded_jwt
+
+def valid_iot_token(token : str, db: Session):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
+    except jwt.DecodeError:
+        return None
+
+    mac_signed = payload.get("bluetooth_mac")
+    device = crud.get_iot_entity_by_bluetooth_mac(db, mac_signed)
+    return device

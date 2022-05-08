@@ -62,3 +62,21 @@ class OpenDoorRequestBase(BaseModel):
 
 class OpenDoorRequestTime(OpenDoorRequestBase):
     time_minutes: int
+
+# Device sends this periodcally
+class IotDoorPollingRequest(BaseModel):
+    bluetooth_mac : str
+    token : str
+    class Config:
+        orm_mode = True
+
+class IotDoorPollingResponse(BaseModel):
+    open_command : bool
+    acces_list_counter : int
+
+class IotMonitorRoomInfo(BaseModel):
+    humidity : int
+    people : int
+    tempreture : int
+    smoke_sensor_reading : int
+    token: str

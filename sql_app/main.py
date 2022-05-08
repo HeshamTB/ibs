@@ -11,7 +11,6 @@ from datetime import timedelta
 import jwt
 
 models.Base.metadata.create_all(bind=engine)
-#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="tkn")
 oauth = OAuth2PasswordBearer(tokenUrl="tkn")
 
 app = FastAPI()
@@ -50,7 +49,6 @@ def get_current_active_user(current_user: schemas.User = Depends(get_current_use
     return current_user
 
 def get_current_iot_device(current_device: schemas.IotBluetoothMac = Depends(),
-                           token: str = Depends(oauth),
                            db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -204,4 +202,29 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+@app.post("/iotdevice/door/status", response_model=schemas.IotDoorPollingResponse, tags=['Iot'])
+def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
+                                  db: Session = Depends(get_db)):
+    # We need db session
+    # API schema request
+    # API schema response
+    device: schemas.IotEntity = auth_helper.valid_iot_token(request.token, db)
+    if not device: 
+        raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials")
+    
+    response : schemas.IotEntityPollingResponse(open_command=device.open_request,
+                                                acces_list_counter=0)
+    return response
 
+@app.post("/iotdevice/monitor/status", tags=['Iot'])
+def polling_method_for_room_monitor(request: schemas.IotMonitorRoomInfo,
+                                    db: Session = Depends(get_db)):
+    device : schemas.IotEntity = auth_helper.valid_iot_token(request.token, db)
+    if not device:
+        raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials")
+    
+    return request
