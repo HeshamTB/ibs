@@ -222,9 +222,9 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
 def polling_method_for_room_monitor(request: schemas.IotMonitorRoomInfo,
                                     db: Session = Depends(get_db)):
     device : schemas.IotEntity = auth_helper.valid_iot_token(request.token, db)
-    if not device:
-        raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials")
+    # if not device:
+    #     raise HTTPException(
+    #     status_code=status.HTTP_401_UNAUTHORIZED,
+    #     detail="Could not validate credentials")
     
     return request
