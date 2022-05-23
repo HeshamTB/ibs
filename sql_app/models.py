@@ -51,3 +51,5 @@ class RoomSensorData(Base):
     temperature = Column(Integer)
     smoke_sensor_reading = Column(Integer)
     timestamp = Column(DateTime)
+
+# TODO: Add table to store active sessions. May periodically clear.

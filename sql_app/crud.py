@@ -33,6 +33,10 @@ def get_user_by_username(db: Session, username: str):
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
+def get_access_log_for_door_by_door_mac(db: Session, bluetooth_mac : str):
+    return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.iot_dev_bluetooth_mac == bluetooth_mac).all()
+
+
 def create_user(db: Session, user: schemas.UserCreate):
     key = crypto.gen_new_key(user.password)
     salt = key[1]

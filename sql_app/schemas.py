@@ -97,3 +97,6 @@ class DoorAccessLog(BaseModel):
     time: datetime
     class Config:
         orm_mode = True
+
+class AccessLogRequest(BaseModel):
+    bluetooth_mac : str

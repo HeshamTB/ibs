@@ -164,6 +164,13 @@ def generate_token_for_iot_device(bluetooth_mac : schemas.IotBluetoothMac,
     tkn = auth_helper.create_iot_dev_token(data)
     return {"access_token": tkn, "token_type": "bearer"}
 
+@app.post("/admin/iotdevice/accesslog/", tags=['Admin'])
+def get_access_log_for_door(request : schemas.AccessLogRequest,
+                            db : Session = Depends(get_db)):
+    device = crud.get_iot_entity_by_bluetooth_mac(db, request.bluetooth_mac)
+    if not device: raise HTTPException(status_code=404, detail="Iot Entity not found")
+    return crud.get_access_log_for_door_by_door_mac(db, request.bluetooth_mac)
+
 @app.get("/users/acesslist/", response_model=List[schemas.IotEntity], tags=['Users'])
 def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_active_user)):
     user = crud.get_user_by_username(db, current_user.username)
