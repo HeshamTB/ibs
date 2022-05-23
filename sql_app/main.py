@@ -16,7 +16,6 @@ oauth = OAuth2PasswordBearer(tokenUrl="tkn")
 app = FastAPI()
 
 
-# Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -170,6 +169,20 @@ def get_access_log_for_door(request : schemas.AccessLogRequest,
     device = crud.get_iot_entity_by_bluetooth_mac(db, request.bluetooth_mac)
     if not device: raise HTTPException(status_code=404, detail="Iot Entity not found")
     return crud.get_access_log_for_door_by_door_mac(db, request.bluetooth_mac)
+
+@app.post("/admin/user/accesslog/email/", tags=['Admin'])
+def get_access_log_history_for_user(request : schemas.UserAccessLogRequestEmail,
+                                    db : Session = Depends(get_db)):
+    user = crud.get_user_by_email(db, request.email)
+    if not user: raise HTTPException(status_code=404, detail="User not found")
+    return crud.get_access_log_for_user_by_id(db, user.id)
+
+@app.post("/admin/user/accesslog/username/", tags=['Admin'])
+def get_access_log_history_for_user(request : schemas.UserAccessLogRequestUsername,
+                                    db : Session = Depends(get_db)):
+    user = crud.get_user_by_username(db, request.username)
+    if not user: raise HTTPException(status_code=404, detail="User not found")
+    return crud.get_access_log_for_user_by_id(db, user.id)
 
 @app.get("/users/acesslist/", response_model=List[schemas.IotEntity], tags=['Users'])
 def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_active_user)):

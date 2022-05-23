@@ -100,3 +100,12 @@ class DoorAccessLog(BaseModel):
 
 class AccessLogRequest(BaseModel):
     bluetooth_mac : str
+
+class UserAccessLogRequestUsername(BaseModel):
+    username : str
+
+class UserAccessLogRequestEmail(BaseModel):
+    email : str
+
+class UserAccessLogRequestID(BaseModel):
+    id : int
