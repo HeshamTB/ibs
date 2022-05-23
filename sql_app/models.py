@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -31,3 +31,21 @@ class UserAuthToIoTDev(Base):
 
     user_id = Column(Integer, ForeignKey('user_accounts.id'), primary_key=True, index=True)
     iot_entity_id = Column(Integer, ForeignKey('iot_entities.id'), primary_key=True, index=True)
+
+class DoorAccessLog(Base):
+    __tablename__ = "door_access_log"
+
+    user_id = Column(Integer, ForeignKey('user_accounts.id'), primary_key=True, index=True)
+    iot_dev_bluetooth_mac = Column(Integer, ForeignKey('iot_entities.id'), primary_key=True, index=True)
+    timestamp = Column(DateTime)
+
+class RoomSensorData(Base):
+    __tablename__ = "room_sensor_data"
+
+    # Data is now not related to a room. We should have a construct for rooms
+    reading_id = Column(Integer, primary_key=True, index=True)
+    humidity = Column(Integer)
+    people = Column(Integer)
+    temperature = Column(Integer)
+    smoke_sensor_reading = Column(Integer)
+    timestamp = Column(DateTime)

@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 
 from . import models, schemas, crypto, auth_helper
 
+from datetime import datetime
+
 # TODO: Data we can collect or log
 #  - Last user connection (link to user)
 #  - Last Iot Entity Connection (link to IotEntity)
@@ -80,3 +82,21 @@ def set_open_door_request(db: Session, iot_entity_id: int):
     db.commit()
     db.refresh(device)
     return True
+
+def record_door_access_log(db: Session, entry: schemas.DoorAccessLog):
+    db_item = models.DoorAccessLog(user_id=entry.user_id,
+                                iot_dev_bluetooth_mac=entry.door_bluetooth_mac,
+                                timestamp=entry.time)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+
+def record_room_sensor_data(db: Session, entry: schemas.IotMonitorRoomInfo):
+    db_item = models.RoomSensorData(humidity=entry.humidity,
+                                    people=entry.people,
+                                    temperature=entry.temperature,
+                                    smoke_sensor_reading=entry.smoke_sensor_reading,
+                                    timestamp=datetime.now())
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)

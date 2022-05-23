@@ -1,6 +1,7 @@
 from typing import Any, List, Optional
 
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class IotEntityBase(BaseModel):
@@ -80,3 +81,17 @@ class IotMonitorRoomInfo(BaseModel):
     temperature : int
     smoke_sensor_reading : int
     token: str
+    class Config:
+        orm_mode = True
+
+class IotMonitorRoomInfoTimestamped(IotMonitorRoomInfo):
+    time: datetime
+    class Config:
+        orm_mode = True
+
+class DoorAccessLog(BaseModel):
+    user_id: int
+    door_bluetooth_mac: str
+    time: datetime
+    class Config:
+        orm_mode = True

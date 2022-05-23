@@ -7,7 +7,7 @@ from . import crud, models, schemas, auth_helper
 from .database import SessionLocal, engine
 
 from typing import List
-from datetime import timedelta
+from datetime import timedelta, datetime
 import jwt
 
 models.Base.metadata.create_all(bind=engine)
@@ -182,6 +182,10 @@ def issue_open_door_command(command: schemas.OpenDoorRequestBase,
     for dev in user.authorized_devices:
         if dev.bluetooth_mac == device.bluetooth_mac:
             crud.set_open_door_request(db, device.id)
+            log_entry = schemas.DoorAccessLog(user_id=current_user.id,
+                                             door_bluetooth_mac=command.bluetooth_mac,
+                                             time=datetime.now())
+            crud.record_door_access_log(db, log_entry)
             return device
     raise err
 
@@ -222,9 +226,9 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
 def polling_method_for_room_monitor(request: schemas.IotMonitorRoomInfo,
                                     db: Session = Depends(get_db)):
     device : schemas.IotEntity = auth_helper.valid_iot_token(request.token, db)
-    # if not device:
-    #     raise HTTPException(
-    #     status_code=status.HTTP_401_UNAUTHORIZED,
-    #     detail="Could not validate credentials")
-    
+    if not device:
+        raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials")
+    crud.record_room_sensor_data(db, request)
     return request
