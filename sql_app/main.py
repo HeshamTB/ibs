@@ -209,17 +209,18 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
 @app.post("/iotdevice/door/status", response_model=schemas.IotDoorPollingResponse, tags=['Iot'])
 def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
                                   db: Session = Depends(get_db)):
-    # We need db session
-    # API schema request
-    # API schema response
+
     device: schemas.IotEntity = auth_helper.valid_iot_token(request.token, db)
     if not device: 
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials")
     
-    response : schemas.IotEntityPollingResponse(open_command=device.open_request,
+    response : schemas.IotDoorPollingResponse = schemas.IotDoorPollingResponse(
+                                                open_command=device.open_request,
                                                 acces_list_counter=0)
+    # Reset open_request to False
+    crud.clear_open_door_request(db, device.id)
     return response
 
 @app.post("/iotdevice/monitor/status", tags=['Iot'])

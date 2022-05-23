@@ -83,6 +83,14 @@ def set_open_door_request(db: Session, iot_entity_id: int):
     db.refresh(device)
     return True
 
+def clear_open_door_request(db: Session, iot_entity_id: int):
+    device = get_iot_entity(db, iot_entity_id)
+    setattr(device, "open_request", False)
+    db.add(device) 
+    db.commit()
+    db.refresh(device)
+    return True
+
 def record_door_access_log(db: Session, entry: schemas.DoorAccessLog):
     db_item = models.DoorAccessLog(user_id=entry.user_id,
                                 iot_dev_bluetooth_mac=entry.door_bluetooth_mac,

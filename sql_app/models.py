@@ -35,8 +35,9 @@ class UserAuthToIoTDev(Base):
 class DoorAccessLog(Base):
     __tablename__ = "door_access_log"
 
-    user_id = Column(Integer, ForeignKey('user_accounts.id'), primary_key=True, index=True)
-    iot_dev_bluetooth_mac = Column(Integer, ForeignKey('iot_entities.id'), primary_key=True, index=True)
+    entry_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('user_accounts.id'))
+    iot_dev_bluetooth_mac = Column(Integer, ForeignKey('iot_entities.id'))
     timestamp = Column(DateTime)
 
 class RoomSensorData(Base):
