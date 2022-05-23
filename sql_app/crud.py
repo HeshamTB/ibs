@@ -39,6 +39,9 @@ def get_access_log_for_door_by_door_mac(db: Session, bluetooth_mac : str):
 def get_access_log_for_user_by_id(db: Session, id : str):
     return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.user_id == id).all()
 
+def get_room_data_now(db: Session):
+    return db.query(models.RoomSensorData)[-1]
+
 def create_user(db: Session, user: schemas.UserCreate):
     key = crypto.gen_new_key(user.password)
     salt = key[1]

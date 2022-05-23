@@ -189,6 +189,10 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     user = crud.get_user_by_username(db, current_user.username)
     return user.authorized_devices
 
+@app.get("/admin/roominfo/now/", tags=['Admin'])
+def get_room_data(db: Session = Depends(get_db)):
+    return crud.get_room_data_now(db)
+
 @app.post("/users/open", tags=['Users'])
 def issue_open_door_command(command: schemas.OpenDoorRequestTime, 
                             db: Session = Depends(get_db),
