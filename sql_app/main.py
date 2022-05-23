@@ -170,7 +170,7 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     return user.authorized_devices
 
 @app.post("/users/open", tags=['Users'])
-def issue_open_door_command(command: schemas.OpenDoorRequestBase, 
+def issue_open_door_command(command: schemas.OpenDoorRequestTime, 
                             db: Session = Depends(get_db),
                             current_user: schemas.User = Depends(get_current_active_user)):
     err = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -181,7 +181,7 @@ def issue_open_door_command(command: schemas.OpenDoorRequestBase,
     user = crud.get_user(db, current_user.id)
     for dev in user.authorized_devices:
         if dev.bluetooth_mac == device.bluetooth_mac:
-            crud.set_open_door_request(db, device.id)
+            crud.set_open_door_request(db, device.id, command.time_seconds)
             log_entry = schemas.DoorAccessLog(user_id=current_user.id,
                                              door_bluetooth_mac=command.bluetooth_mac,
                                              time=datetime.now())
@@ -218,7 +218,8 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
     
     response : schemas.IotDoorPollingResponse = schemas.IotDoorPollingResponse(
                                                 open_command=device.open_request,
-                                                acces_list_counter=0)
+                                                acces_list_counter=0,
+                                                time_seconds=device.time_seconds)
     # Reset open_request to False
     crud.clear_open_door_request(db, device.id)
     return response

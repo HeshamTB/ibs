@@ -75,9 +75,12 @@ def remove_user_link_to_iot(db: Session, user_id: int, iot_dev_id: int):
     #db.refresh(link)
     return True
 
-def set_open_door_request(db: Session, iot_entity_id: int):
+def set_open_door_request(db: Session, iot_entity_id: int, time_seconds : int):
     device = get_iot_entity(db, iot_entity_id)
     setattr(device, "open_request", True)
+    if time_seconds < 1:
+        time_seconds = 10 # Magic number move to global constant
+    setattr(device, "time_seconds", time_seconds)
     db.add(device) 
     db.commit()
     db.refresh(device)
@@ -86,6 +89,7 @@ def set_open_door_request(db: Session, iot_entity_id: int):
 def clear_open_door_request(db: Session, iot_entity_id: int):
     device = get_iot_entity(db, iot_entity_id)
     setattr(device, "open_request", False)
+    setattr(device, "time_seconds", 10)
     db.add(device) 
     db.commit()
     db.refresh(device)
