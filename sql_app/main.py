@@ -13,7 +13,7 @@ import jwt
 models.Base.metadata.create_all(bind=engine)
 oauth = OAuth2PasswordBearer(tokenUrl="tkn")
 
-app = FastAPI()
+app = FastAPI(title="IoT Building System")
 
 
 def get_db():
