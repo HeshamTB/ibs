@@ -1,13 +1,31 @@
-- [ ] Redesign database
+- [x] Constrcut DB Schema
+- [x] Issue requests from Lap to Pi or vica versa
+- [x] Decide HTTP vs MQTT vs CoAP
+- [x] Hash passwords
+- [x] User registraion
+- [x] User login in API
+	- [x] JWT token access
+	- [x] Look into how to revoke a signed key
+	- [ ] Record Session info in token & db (allow for session cancel)
+- [x] Add username for users (now only email)
+- [X] Expose Room monitor function (temp, count humid..)
+- [X] Expose door lock function
+- [X] Record access log
+- [X] Expose data analysis
+- [ ] Load backend onto RPi
+- [ ] Test connections in lab network
 - [ ] Define emrgancy triggers (manual and automatic)
 - [ ] Expose temporary control in case of emergancy
         - Triggers
         - Acccess
         - Resolve (revoke access)
-- [ ] Temporal door open commands (Needs door state to operate efficiatly)
-        - Open for 1H
-        - Open to 1:30PM
-        - Set schedual
+- [X] Temporal door open commands (Needs door state to operate efficiatly)
+        - [X] Open for 1H
+        - [ ] Open to 1:30PM
+        - [ ] Set schedual
 - [X] Issue door open command
 - [X] Make functions to gen a IotEntity token
-- [ ] Save prefix of token to allow/revoke token??
+- [ ] Write a small program/script to generate new Iot token and add new Iot Device into database
+- [ ] Make inital database entries automatic for easy reset
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJibHVldG9vdGhfbWFjIjoic3RyaW5nIn0.ELl5AfBR1NdM4_OFhl_SCTm9EMPpqjiCKOSS0CrOJps
