@@ -227,6 +227,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     access_token = auth_helper.create_access_token(
         data={"sub": form_data.username}, expires_delta=timedelta(minutes=15)
     )
+    crud.set_user_last_token(db, form_data.username, access_token)
     return {"access_token": access_token, "token_type": "bearer"}
 
 

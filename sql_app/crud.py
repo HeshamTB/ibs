@@ -1,5 +1,6 @@
 # CRUD (Create, Read, Update, Delete) from db
 
+from sqlalchemy import select, join
 from sqlalchemy.orm import Session
 
 from . import models, schemas, crypto, auth_helper
@@ -12,7 +13,7 @@ from datetime import datetime
 #  - Any open request (link to user)
 #  - Any polling from IotEntity? Maybe to much data
 
-def get_user(db: Session, user_id: int):
+def get_user(db: Session, user_id: int) -> models.User:
     return db.query(models.User).get(user_id)
 
 def get_iot_entity(db: Session, id: int):
@@ -21,13 +22,13 @@ def get_iot_entity(db: Session, id: int):
 def get_iot_entity_by_description(db: Session, description: str):
     return db.query(models.IotEntity).filter(models.IotEntity.description == description).first()
 
-def get_iot_entity_by_bluetooth_mac(db: Session, bluetooth_mac: str):
+def get_iot_entity_by_bluetooth_mac(db: Session, bluetooth_mac: str) -> models.IotEntity:
     return db.query(models.IotEntity).filter(models.IotEntity.bluetooth_mac == bluetooth_mac).first()
 
-def get_user_by_email(db: Session, email: str):
+def get_user_by_email(db: Session, email: str) -> models.User:
     return db.query(models.User).filter(models.User.email == email).first()
 
-def get_user_by_username(db: Session, username: str):
+def get_user_by_username(db: Session, username: str) -> models.User:
     return db.query(models.User).filter(models.User.username == username).first()
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
@@ -46,7 +47,10 @@ def create_user(db: Session, user: schemas.UserCreate):
     key = crypto.gen_new_key(user.password)
     salt = key[1]
     hashed_pass = key[0]
-    db_user = models.User(email=user.email, username=user.username,hashed_password=hashed_pass, passwd_salt=salt)
+    db_user = models.User(email=user.email,
+                          username=user.username,
+                          hashed_password=hashed_pass,
+                          passwd_salt=salt)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -94,6 +98,18 @@ def set_open_door_request(db: Session, iot_entity_id: int, time_seconds : int):
     db.commit()
     db.refresh(device)
     return True
+
+def set_user_last_token(db: Session, username: str, token: str):
+    user : models.User = get_user_by_username(db, username)
+    user.last_token = token
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return True
+
+def get_user_last_token(db: Session, username: str):
+    user : models.User = get_user_by_username(db, username)
+    return user.last_token # This method is bad security practice.
 
 def clear_open_door_request(db: Session, iot_entity_id: int):
     device = get_iot_entity(db, iot_entity_id)

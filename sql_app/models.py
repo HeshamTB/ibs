@@ -13,6 +13,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     passwd_salt = Column(String, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    last_token = Column(String, nullable=True)
 
     authorized_devices = relationship("IotEntity", secondary= 'user_iot_link')
 
