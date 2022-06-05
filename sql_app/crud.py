@@ -70,9 +70,11 @@ def create_iot_entity(db: Session, iot_entity: schemas.IotEntityCreate):
 
 def create_user_link_to_iot(db: Session, user_id: int, iot_dev_id: int):
     # Ensure link is not already present and it does not allow duplicates
-    link = db.query(models.UserAuthToIoTDev).filter(models.UserAuthToIoTDev.user_id == user_id).filter(models.UserAuthToIoTDev.iot_entity_id == iot_dev_id).first()
+    link = db.query(models.UserAuthToIoTDev).filter(models.UserAuthToIoTDev.user_id == user_id).filter(models.UserAuthToIoTDev.iot_id == iot_dev_id).first()
     if link: return True
-    new_link = models.UserAuthToIoTDev(user_id=user_id, iot_entity_id=iot_dev_id)
+    new_link = models.UserAuthToIoTDev(user_id=user_id,
+                                       iot_id=iot_dev_id,
+                                       timestamp=datetime.now())
     db.add(new_link)
     db.commit()
     db.refresh(new_link)

@@ -15,7 +15,8 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     last_token = Column(String, nullable=True)
 
-    authorized_devices = relationship("IotEntity", secondary= 'user_iot_link')
+    authorized_devices = relationship("IotEntity", secondary="user_iot_link", back_populates="authorized_users")
+    #authorized_devices = relationship("IotEntity", secondary= 'user_iot_link')
 
 
 class IotEntity(Base):
@@ -26,13 +27,15 @@ class IotEntity(Base):
     description = Column(String(512))
     open_request = Column(Boolean, default=False)
     time_seconds = Column(Integer, default=10)
-    authorized_users = relationship("User", secondary= 'user_iot_link')
+    authorized_users = relationship("User", secondary="user_iot_link", back_populates="authorized_devices")
+    #authorized_users = relationship("User", secondary= 'user_iot_link')
 
 class UserAuthToIoTDev(Base):
     __tablename__ = "user_iot_link"
 
-    user_id = Column(Integer, ForeignKey('user_accounts.id'), primary_key=True, index=True)
-    iot_entity_id = Column(Integer, ForeignKey('iot_entities.id'), primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user_accounts.id"), primary_key=True)
+    iot_id = Column(Integer, ForeignKey("iot_entities.id"), primary_key=True)
+    timestamp = Column(DateTime)
 
 class DoorAccessLog(Base):
     __tablename__ = "door_access_log"
