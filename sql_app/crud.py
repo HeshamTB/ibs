@@ -82,7 +82,10 @@ def create_user_link_to_iot(db: Session, user_id: int, iot_dev_id: int):
 
 def remove_user_link_to_iot(db: Session, user_id: int, iot_dev_id: int):
     # Ensure link is not already present and it does not allow duplicates
-    link = db.query(models.UserAuthToIoTDev).filter(models.UserAuthToIoTDev.user_id == user_id).filter(models.UserAuthToIoTDev.iot_entity_id == iot_dev_id).first()
+    link = (db.query(models.UserAuthToIoTDev)
+        .filter(models.UserAuthToIoTDev.user_id == user_id)
+        .filter(models.UserAuthToIoTDev.iot_id == iot_dev_id)
+        .first())
     if not link: return True
     db.delete(link)
     db.flush()
