@@ -5,4 +5,5 @@ server.orig.key
 __pycache__
 venv/
 *.db
+sql_app.db*
 .vscode/
