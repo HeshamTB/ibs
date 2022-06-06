@@ -4,7 +4,9 @@ asgiref==3.5.0
 attrs==21.4.0
 bitlist==0.6.2
 cbor2==5.4.2.post1
+certifi==2022.5.18.1
 cffi==1.15.0
+charset-normalizer==2.0.12
 click==8.0.4
 cryptography==36.0.1
 Cython==0.29.28
@@ -34,6 +36,7 @@ python-decouple==3.6
 python-dotenv==0.19.2
 python-multipart==0.0.5
 PyYAML==6.0
+requests==2.27.1
 six==1.16.0
 sniffio==1.2.0
 SQLAlchemy==1.4.31
@@ -41,6 +44,7 @@ starlette==0.17.1
 termcolor==1.1.0
 tomli==2.0.1
 typing_extensions==4.1.1
+urllib3==1.26.9
 uvicorn==0.17.5
 uvloop==0.16.0
 watchgod==0.7
