@@ -1,6 +1,7 @@
 aiocoap==0.4.3
 anyio==3.5.0
 asgiref==3.5.0
+attrs==21.4.0
 bitlist==0.6.2
 cbor2==5.4.2.post1
 cffi==1.15.0
@@ -17,12 +18,18 @@ greenlet==1.1.2
 h11==0.13.0
 httptools==0.3.0
 idna==3.3
+iniconfig==1.1.1
 LinkHeader==0.4.3
+packaging==21.3
 parts==1.2.2
+pluggy==1.0.0
+py==1.11.0
 pycparser==2.21
 pydantic==1.9.0
 Pygments==2.11.2
 PyJWT==2.3.0
+pyparsing==3.0.9
+pytest==7.1.2
 python-decouple==3.6
 python-dotenv==0.19.2
 python-multipart==0.0.5
@@ -32,6 +39,7 @@ sniffio==1.2.0
 SQLAlchemy==1.4.31
 starlette==0.17.1
 termcolor==1.1.0
+tomli==2.0.1
 typing_extensions==4.1.1
 uvicorn==0.17.5
 uvloop==0.16.0
