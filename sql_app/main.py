@@ -113,6 +113,7 @@ def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReques
     if not res:
         raise HTTPException(status_code=500, detail="Could not complete operation")
 
+    crud.increment_door_access_list_counter(db, iot_entity)
     return
 
 @app.post("/admin/users/disallowdevice/id", tags=['Admin'])
@@ -128,7 +129,8 @@ def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReq
     res = crud.remove_user_link_to_iot(db, request.user_id, request.iot_entity_id)
     if not res:
         raise HTTPException(status_code=500, detail="Could not complete operation")
-
+    
+    crud.increment_door_access_list_counter(db, iot_entity)
     return
 
 @app.post("/admin/users/allowdevice/name", tags=['Admin'])

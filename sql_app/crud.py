@@ -142,3 +142,10 @@ def record_room_sensor_data(db: Session, entry: schemas.IotMonitorRoomInfo):
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
+
+def increment_door_access_list_counter(db: Session, iot_entity: models.IotEntity):
+    #setattr(iot_entity, "acces_list_counter", iot_entity.acces_list_counter + 1)
+    iot_entity.acces_list_counter = iot_entity.acces_list_counter + 1
+    db.add(iot_entity)
+    db.commit()
+    db.refresh(iot_entity)

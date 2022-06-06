@@ -16,7 +16,6 @@ class User(Base):
     last_token = Column(String, nullable=True)
 
     authorized_devices = relationship("IotEntity", secondary="user_iot_link", back_populates="authorized_users")
-    #authorized_devices = relationship("IotEntity", secondary= 'user_iot_link')
 
 
 class IotEntity(Base):
@@ -27,8 +26,8 @@ class IotEntity(Base):
     description = Column(String(512))
     open_request = Column(Boolean, default=False)
     time_seconds = Column(Integer, default=10)
+    acces_list_counter = Column(Integer, default=0)
     authorized_users = relationship("User", secondary="user_iot_link", back_populates="authorized_devices")
-    #authorized_users = relationship("User", secondary= 'user_iot_link')
 
 class UserAuthToIoTDev(Base):
     __tablename__ = "user_iot_link"

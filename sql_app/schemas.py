@@ -26,6 +26,7 @@ class IotEntity(IotEntityBase):
     #authorized_users: List[User] = []
     open_request: bool # Flag to open
     time_seconds: int
+    acces_list_counter: int
     class Config:
         orm_mode = True
 
