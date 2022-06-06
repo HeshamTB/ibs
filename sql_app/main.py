@@ -64,13 +64,22 @@ def get_current_iot_device(current_device: schemas.IotBluetoothMac = Depends(),
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Email/Username already registered")
 
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user:
-        raise HTTPException(status_code=400, detail="Username already registerd")
-        
-    return crud.create_user(db=db, user=user)
+        raise HTTPException(status_code=400, detail="Email/Username already registered")
+    
+    db_user = crud.create_user(db=db, user=user)
+    if not db_user:
+        raise HTTPException(status_code=500, detail="Failed to create user")
+    
+    access_token = auth_helper.create_access_token(
+        data={"sub": db_user.username}, expires_delta=timedelta(minutes=15)
+    )
+    crud.set_user_last_token(db, db_user.username, access_token)
+
+    return db_user 
 
 @app.get("/users/me/", response_model=schemas.User, tags=['Users'])
 def get_user_details(current_user: schemas.User = Depends(get_current_active_user)):
