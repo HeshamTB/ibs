@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, OAuth2AuthorizationCodeBearer
 from fastapi.security.api_key import APIKey
+from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas, auth_helper
@@ -270,3 +271,35 @@ def polling_method_for_room_monitor(request: schemas.IotMonitorRoomInfo,
         detail="Could not validate credentials")
     crud.record_room_sensor_data(db, request)
     return request
+
+@app.post("/iotdevice/door/users", response_class=PlainTextResponse, tags=['Iot'])
+def get_allowed_usernames(request: schemas.IotDoorPollingRequest,
+                          db: Session = Depends(get_db)):
+
+    iot_door = crud.get_iot_entity_by_bluetooth_mac(db, request.bluetooth_mac)
+    if not iot_door: 
+        raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials")
+    usernames = str()
+    for user in iot_door.authorized_users:
+        db_user : models.User = user
+        usernames = usernames + db_user.username + '\n'
+    
+    return usernames
+
+@app.post("/iotdevice/door/tkns", response_class=PlainTextResponse, tags=['Iot'])
+def get_allowed_usernames(request: schemas.IotDoorPollingRequest,
+                          db: Session = Depends(get_db)):
+
+    iot_door = crud.get_iot_entity_by_bluetooth_mac(db, request.bluetooth_mac)
+    if not iot_door: 
+        raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials")
+    tkns = str()
+    for user in iot_door.authorized_users:
+        db_user : models.User = user
+        tkns = tkns + db_user.last_token + '\n'
+    
+    return tkns
