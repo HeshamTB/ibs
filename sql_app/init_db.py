@@ -16,6 +16,7 @@ def init_user():
     token = auth_helper.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=15))
     res = crud.set_user_last_token(db, user.username, token)
 
+    user_exists = None
     user = schemas.UserCreate(email="osama@mail.none",
                             username="Osama",
                             password=config('first_user_pass'))
@@ -25,6 +26,7 @@ def init_user():
     token = auth_helper.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=15))
     res = crud.set_user_last_token(db, user.username, token)
 
+    user_exists = None
     user = schemas.UserCreate(email="Hussain@mail.none",
                             username="Hussain",
                             password=config('first_user_pass'))
@@ -34,6 +36,7 @@ def init_user():
     token = auth_helper.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=15))
     res = crud.set_user_last_token(db, user.username, token)
 
+    user_exists = None
     user = schemas.UserCreate(email="Assad@mail.none",
                             username="Assad",
                             password=config('first_user_pass'))
@@ -57,8 +60,12 @@ def init_monitor():
     if monitor_exists: return
     crud.create_iot_entity(db, iot_monitor)
 
+def init_allowance():
+    crud.create_user_link_to_iot(db, 1, 1)
+
 def init():
     init_user()
     init_door()
     init_monitor()
+    init_allowance()
     
