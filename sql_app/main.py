@@ -304,6 +304,8 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
     # Reset open_request to False
     crud.clear_open_door_request(db, device.id)
     crud.clear_close_door_request(db, device.id)
+    crud.set_door_state(db, device, device.state)
+
     return response
 
 @app.post("/iotdevice/monitor/status", tags=['Iot'])

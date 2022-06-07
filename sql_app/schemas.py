@@ -72,6 +72,7 @@ class CloseDoorRequest(OpenDoorRequestBase):
 # Device sends this periodcally
 class IotDoorPollingRequest(BaseModel):
     bluetooth_mac : str
+    state: int
     token : str
     class Config:
         orm_mode = True

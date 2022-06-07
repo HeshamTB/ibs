@@ -126,6 +126,12 @@ def set_user_last_token(db: Session, username: str, token: str):
     db.refresh(user)
     return True
 
+def set_door_state(db: Session, iot_device: models.IotEntity, state: bool):
+    iot_device.state = state
+    db.add(iot_device)
+    db.commit()
+    db.refresh(iot_device)
+
 def get_user_last_token(db: Session, username: str):
     user : models.User = get_user_by_username(db, username)
     return user.last_token # This method is bad security practice.

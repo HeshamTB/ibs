@@ -28,6 +28,7 @@ class IotEntity(Base):
     time_seconds = Column(Integer, default=10)
     acces_list_counter = Column(Integer, default=0)
     force_close = Column(Boolean, default=False)
+    state = Column(Boolean, default=False) # True is open, False is closed
     authorized_users = relationship("User", secondary="user_iot_link", back_populates="authorized_devices")
 
 class UserAuthToIoTDev(Base):
@@ -63,4 +64,6 @@ class UserConnectionHistory(Base):
     reading_id = Column(Integer, primary_key=True)
     user_id = Column(Integer,ForeignKey("user_accounts.id"), index=True)
     timestamp = Column(DateTime)
+    # TODO: add ip
+
 # TODO: Add table to store active sessions. May periodically clear.
