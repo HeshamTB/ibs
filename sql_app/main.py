@@ -4,8 +4,9 @@ from fastapi.security.api_key import APIKey
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 
-from . import crud, models, schemas, auth_helper
+from . import crud, models, schemas, auth_helper, init_db
 from .database import SessionLocal, engine
+from .utils import get_db
 
 from typing import List
 from datetime import timedelta, datetime
@@ -16,13 +17,10 @@ oauth = OAuth2PasswordBearer(tokenUrl="tkn")
 
 app = FastAPI(title="IoT Building System")
 
+# Split into endpoints modules
+#app.include_router(users.router,prefix="/users", tags=["User"])
+init_db.init()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def get_current_user(token: str = Depends(oauth), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
