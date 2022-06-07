@@ -155,7 +155,8 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     for device in user.authorized_devices:
         dev_db : models.IotEntity = device
         sensors = crud.get_room_data_now(db)
-        if not sensors: raise HTTPException(status_code=500, detail="No Room link")
+        if not sensors: raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                            detail="No Room link")
         entry : schemas.RoomOverview = schemas.RoomOverview(
             id=dev_db.id,
             description=dev_db.description,
@@ -192,22 +193,26 @@ def create_iot_entities(iot_entity: schemas.IotEntityCreate, db: Session = Depen
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="User not found")
     return db_user
 
 @app.post("/admin/users/allowdevice/id", tags=['Admin'])
 def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            detail="User not found")
 
     iot_entity = crud.get_iot_entity(db, request.iot_entity_id)
     if not iot_entity:
-        raise HTTPException(status_code=404, detail="Iot Entity not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            detail="Iot Entity not found")
 
     res = crud.create_user_link_to_iot(db, request.user_id, request.iot_entity_id)
     if not res:
-        raise HTTPException(status_code=500, detail="Could not complete operation")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Could not complete operation")
 
     crud.increment_door_access_list_counter(db, iot_entity)
     return
@@ -216,15 +221,18 @@ def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReques
 def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            detail="User not found")
 
     iot_entity = crud.get_iot_entity(db, request.iot_entity_id)
     if not iot_entity:
-        raise HTTPException(status_code=404, detail="Iot Entity not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            detail="Iot Entity not found")
 
     res = crud.remove_user_link_to_iot(db, request.user_id, request.iot_entity_id)
     if not res:
-        raise HTTPException(status_code=500, detail="Could not complete operation")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Could not complete operation")
     
     crud.increment_door_access_list_counter(db, iot_entity)
     return
@@ -233,15 +241,18 @@ def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReq
 def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequestByUsername, db: Session = Depends(get_db)):
     user = crud.get_user_by_username(db, request.username)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            detail="User not found")
 
     iot_entity = crud.get_iot_entity_by_description(db, request.description)
     if not iot_entity:
-        raise HTTPException(status_code=404, detail="Iot Entity not found")
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            detail="Iot Entity not found")
 
     res = crud.create_user_link_to_iot(db, user.id, iot_entity.id)
     if not res:
-        raise HTTPException(status_code=500, detail="Could not complete operation")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Could not complete operation")
 
     return
 
@@ -265,21 +276,21 @@ def generate_token_for_iot_device(bluetooth_mac : schemas.IotBluetoothMac,
 def get_access_log_for_door(request : schemas.AccessLogRequest,
                             db : Session = Depends(get_db)):
     device = crud.get_iot_entity_by_bluetooth_mac(db, request.bluetooth_mac)
-    if not device: raise HTTPException(status_code=404, detail="Iot Entity not found")
+    if not device: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Iot Entity not found")
     return crud.get_access_log_for_door_by_door_mac(db, request.bluetooth_mac)
 
 @app.post("/admin/user/accesslog/email/", tags=['Admin'])
 def get_access_log_history_for_user(request : schemas.UserAccessLogRequestEmail,
                                     db : Session = Depends(get_db)):
     user = crud.get_user_by_email(db, request.email)
-    if not user: raise HTTPException(status_code=404, detail="User not found")
+    if not user: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
     return crud.get_access_log_for_user_by_id(db, user.id)
 
 @app.post("/admin/user/accesslog/username/", tags=['Admin'])
 def get_access_log_history_for_user(request : schemas.UserAccessLogRequestUsername,
                                     db : Session = Depends(get_db)):
     user = crud.get_user_by_username(db, request.username)
-    if not user: raise HTTPException(status_code=404, detail="User not found")
+    if not user: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
     return crud.get_access_log_for_user_by_id(db, user.id)
 
 @app.get("/admin/roominfo/now/", tags=['Admin'])
