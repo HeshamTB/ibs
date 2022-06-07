@@ -15,7 +15,33 @@ def init_user():
     crud.create_user(db, user)
     token = auth_helper.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=15))
     res = crud.set_user_last_token(db, user.username, token)
-    if not res: print("Failed to add initial token")
+
+    user = schemas.UserCreate(email="osama@mail.none",
+                            username="Osama",
+                            password=config('first_user_pass'))
+    user_exists = crud.get_user_by_email(db, user.email)
+    if user_exists: return
+    crud.create_user(db, user)
+    token = auth_helper.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=15))
+    res = crud.set_user_last_token(db, user.username, token)
+
+    user = schemas.UserCreate(email="Hussain@mail.none",
+                            username="Hussain",
+                            password=config('first_user_pass'))
+    user_exists = crud.get_user_by_email(db, user.email)
+    if user_exists: return
+    crud.create_user(db, user)
+    token = auth_helper.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=15))
+    res = crud.set_user_last_token(db, user.username, token)
+
+    user = schemas.UserCreate(email="Assad@mail.none",
+                            username="Assad",
+                            password=config('first_user_pass'))
+    user_exists = crud.get_user_by_email(db, user.email)
+    if user_exists: return
+    crud.create_user(db, user)
+    token = auth_helper.create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=15))
+    res = crud.set_user_last_token(db, user.username, token)
 
 def init_door():
     iot_door = schemas.IotEntityCreate(bluetooth_mac="ff:ff:ff:ff",
