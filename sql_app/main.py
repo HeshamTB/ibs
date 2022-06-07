@@ -323,7 +323,7 @@ def polling_method_for_room_monitor(request: schemas.IotMonitorRoomInfo,
 def get_allowed_usernames(request: schemas.IotDoorPollingRequest,
                           db: Session = Depends(get_db)):
 
-    iot_door : models.IotEntity = auth_helper.valid_iot_token(request, db)
+    iot_door : models.IotEntity = auth_helper.valid_iot_token(request.token, db)
     if not iot_door: 
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -339,7 +339,7 @@ def get_allowed_usernames(request: schemas.IotDoorPollingRequest,
 def get_allowed_usernames(request: schemas.IotDoorPollingRequest,
                           db: Session = Depends(get_db)):
 
-    iot_door : models.IotEntity = auth_helper.valid_iot_token(request, db)
+    iot_door : models.IotEntity = auth_helper.valid_iot_token(request.token, db)
     if not iot_door: 
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
