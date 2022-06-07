@@ -298,7 +298,7 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
     
     response : schemas.IotDoorPollingResponse = schemas.IotDoorPollingResponse(
                                                 open_command=device.open_request,
-                                                acces_list_counter=0,
+                                                acces_list_counter=device.acces_list_counter,
                                                 time_seconds=device.time_seconds,
                                                 force_close=device.force_close)
     # Reset open_request to False
