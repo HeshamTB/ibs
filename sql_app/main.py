@@ -196,10 +196,28 @@ def get_access_log_history_for_user(request : schemas.UserAccessLogRequestUserna
     if not user: raise HTTPException(status_code=404, detail="User not found")
     return crud.get_access_log_for_user_by_id(db, user.id)
 
-@app.get("/users/acesslist/", response_model=List[schemas.IotEntity], tags=['Users'])
+@app.get("/users/acesslist/", response_model=List[schemas.RoomOverview], tags=['Users'])
 def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_active_user)):
     user = crud.get_user_by_username(db, current_user.username)
-    return user.authorized_devices
+    access_list = list()
+    for device in user.authorized_devices:
+        dev_db : models.IotEntity = device
+        sensors = crud.get_room_data_now(db)
+        if not sensors: raise HTTPException(status_code=500, detail="No Room link")
+        entry : schemas.RoomOverview = schemas.RoomOverview(
+            id=dev_db.id,
+            description=dev_db.description,
+            bluetooth_mac=dev_db.bluetooth_mac,
+            open_request=dev_db.open_request,
+            time_seconds=dev_db.time_seconds,
+            acces_list_counter=dev_db.acces_list_counter,
+            humidity=sensors.humidity,
+            people=sensors.people,
+            temperature=sensors.temperature,
+            smoke_sensor_reading=sensors.smoke_sensor_reading
+        )
+        access_list.append(entry)
+    return access_list
 
 @app.get("/admin/roominfo/now/", tags=['Admin'])
 def get_room_data(db: Session = Depends(get_db)):

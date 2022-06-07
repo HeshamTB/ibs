@@ -110,3 +110,9 @@ class UserAccessLogRequestEmail(BaseModel):
 
 class UserAccessLogRequestID(BaseModel):
     id : int
+
+class RoomOverview(IotEntity):
+    humidity : int
+    people : int
+    temperature : int
+    smoke_sensor_reading : int

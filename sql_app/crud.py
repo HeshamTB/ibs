@@ -40,7 +40,7 @@ def get_access_log_for_door_by_door_mac(db: Session, bluetooth_mac : str):
 def get_access_log_for_user_by_id(db: Session, id : str):
     return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.user_id == id).all()
 
-def get_room_data_now(db: Session):
+def get_room_data_now(db: Session) -> models.RoomSensorData:
     return db.query(models.RoomSensorData)[-1]
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -144,7 +144,6 @@ def record_room_sensor_data(db: Session, entry: schemas.IotMonitorRoomInfo):
     db.refresh(db_item)
 
 def increment_door_access_list_counter(db: Session, iot_entity: models.IotEntity):
-    #setattr(iot_entity, "acces_list_counter", iot_entity.acces_list_counter + 1)
     iot_entity.acces_list_counter = iot_entity.acces_list_counter + 1
     db.add(iot_entity)
     db.commit()
