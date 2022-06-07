@@ -27,6 +27,7 @@ class IotEntity(Base):
     open_request = Column(Boolean, default=False)
     time_seconds = Column(Integer, default=10)
     acces_list_counter = Column(Integer, default=0)
+    force_close = Column(Boolean, default=False)
     authorized_users = relationship("User", secondary="user_iot_link", back_populates="authorized_devices")
 
 class UserAuthToIoTDev(Base):
@@ -41,7 +42,8 @@ class DoorAccessLog(Base):
 
     entry_id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('user_accounts.id'))
-    iot_dev_bluetooth_mac = Column(Integer, ForeignKey('iot_entities.id'))
+    iot_id = Column(Integer, ForeignKey('iot_entities.id'))
+    command = Column(String(16))
     timestamp = Column(DateTime)
 
 class RoomSensorData(Base):

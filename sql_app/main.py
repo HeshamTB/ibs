@@ -98,11 +98,31 @@ def issue_open_door_command(command: schemas.OpenDoorRequestTime,
         if dev.bluetooth_mac == device.bluetooth_mac:
             crud.set_open_door_request(db, device.id, command.time_seconds)
             log_entry = schemas.DoorAccessLog(user_id=current_user.id,
-                                             door_bluetooth_mac=command.bluetooth_mac,
-                                             time=datetime.now())
+                                             iot_id=device.id,
+                                             command="OPEN",
+                                             timestamp=datetime.now())
             crud.record_door_access_log(db, log_entry)
             return device
     raise err
+
+@app.post("/users/close", tags=['Users'])
+def issue_close_door_command(command: schemas.CloseDoorRequest,
+                             db: Session = Depends(get_db),
+                             current_user: schemas.User = Depends(get_current_active_user)):
+    err = HTTPException(status.HTTP_401_UNAUTHORIZED,
+            detail="Unaithrized to close")
+    device = crud.get_iot_entity_by_bluetooth_mac(db, command.bluetooth_mac)
+    if not device: raise err
+    user = crud.get_user(db, current_user.id)
+    for dev in user.authorized_devices:
+        if dev.bluetooth_mac == device.bluetooth_mac:
+            crud.set_close_door_request(db, device.id)
+            log_entry = schemas.DoorAccessLog(user_id=current_user.id,
+                                             iot_id=device.id,
+                                             command="CLOSE",
+                                             timestamp=datetime.now())
+            crud.record_door_access_log(db, log_entry)
+            return device
 
 @app.post("/users/tkn", response_model=schemas.Token, tags=['Users'])
 @app.post("/tkn", response_model=schemas.Token, tags=['Users'])
@@ -262,7 +282,7 @@ def get_room_data(db: Session = Depends(get_db)):
 def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
                                   db: Session = Depends(get_db)):
 
-    device: schemas.IotEntity = auth_helper.valid_iot_token(request.token, db)
+    device: models.IotEntity = auth_helper.valid_iot_token(request.token, db)
     if not device: 
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -271,9 +291,11 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
     response : schemas.IotDoorPollingResponse = schemas.IotDoorPollingResponse(
                                                 open_command=device.open_request,
                                                 acces_list_counter=0,
-                                                time_seconds=device.time_seconds)
+                                                time_seconds=device.time_seconds,
+                                                force_close=device.force_close)
     # Reset open_request to False
     crud.clear_open_door_request(db, device.id)
+    crud.clear_close_door_request(db, device.id)
     return response
 
 @app.post("/iotdevice/monitor/status", tags=['Iot'])

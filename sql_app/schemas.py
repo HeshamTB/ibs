@@ -26,6 +26,7 @@ class IotEntity(IotEntityBase):
     #authorized_users: List[User] = []
     open_request: bool # Flag to open
     time_seconds: int
+    force_close: bool
     acces_list_counter: int
     class Config:
         orm_mode = True
@@ -66,6 +67,8 @@ class OpenDoorRequestBase(BaseModel):
 class OpenDoorRequestTime(OpenDoorRequestBase):
     time_seconds: int
 
+class CloseDoorRequest(OpenDoorRequestBase):
+    pass
 # Device sends this periodcally
 class IotDoorPollingRequest(BaseModel):
     bluetooth_mac : str
@@ -77,6 +80,7 @@ class IotDoorPollingResponse(BaseModel):
     open_command : bool
     acces_list_counter : int
     time_seconds : int
+    force_close: bool
 
 class IotMonitorRoomInfo(BaseModel):
     humidity : int
@@ -94,8 +98,9 @@ class IotMonitorRoomInfoTimestamped(IotMonitorRoomInfo):
 
 class DoorAccessLog(BaseModel):
     user_id: int
-    door_bluetooth_mac: str
-    time: datetime
+    iot_id: str
+    command: str
+    timestamp: datetime
     class Config:
         orm_mode = True
 
