@@ -14,7 +14,7 @@ class User(Base):
     passwd_salt = Column(String, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     last_token = Column(String, nullable=True)
-
+    connections = relationship("UserConnectionHistory")
     authorized_devices = relationship("IotEntity", secondary="user_iot_link", back_populates="authorized_users")
 
 
@@ -57,4 +57,10 @@ class RoomSensorData(Base):
     smoke_sensor_reading = Column(Integer)
     timestamp = Column(DateTime)
 
+class UserConnectionHistory(Base):
+    __tablename__ = "user_connection_history"
+
+    reading_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer,ForeignKey("user_accounts.id"), index=True)
+    timestamp = Column(DateTime)
 # TODO: Add table to store active sessions. May periodically clear.

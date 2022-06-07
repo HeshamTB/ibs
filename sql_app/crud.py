@@ -163,3 +163,9 @@ def increment_door_access_list_counter(db: Session, iot_entity: models.IotEntity
     db.add(iot_entity)
     db.commit()
     db.refresh(iot_entity)
+
+def record_user_connection(db: Session, user: models.User, time: datetime):
+    entry = models.UserConnectionHistory(user_id=user.id, timestamp=time)
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)

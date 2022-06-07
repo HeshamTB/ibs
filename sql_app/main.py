@@ -77,11 +77,13 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         data={"sub": db_user.username}, expires_delta=timedelta(minutes=15)
     )
     crud.set_user_last_token(db, db_user.username, access_token)
-
+    crud.record_user_connection(db, db_user, datetime.now())
     return db_user 
 
 @app.get("/users/me/", response_model=schemas.User, tags=['Users'])
-def get_user_details(current_user: schemas.User = Depends(get_current_active_user)):
+def get_user_details(db: Session = Depends(get_db),
+                     current_user: schemas.User = Depends(get_current_active_user)):
+    crud.record_user_connection(db, current_user, datetime.now())
     return current_user
 
 @app.post("/users/open", tags=['Users'])
@@ -102,6 +104,8 @@ def issue_open_door_command(command: schemas.OpenDoorRequestTime,
                                              command="OPEN",
                                              timestamp=datetime.now())
             crud.record_door_access_log(db, log_entry)
+            crud.record_user_connection(db, current_user, datetime.now())
+
             return device
     raise err
 
@@ -122,6 +126,8 @@ def issue_close_door_command(command: schemas.CloseDoorRequest,
                                              command="CLOSE",
                                              timestamp=datetime.now())
             crud.record_door_access_log(db, log_entry)
+            crud.record_user_connection(db, current_user, datetime.now())
+
             return device
 
 @app.post("/users/tkn", response_model=schemas.Token, tags=['Users'])
@@ -139,6 +145,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         data={"sub": form_data.username}, expires_delta=timedelta(minutes=15)
     )
     crud.set_user_last_token(db, form_data.username, access_token)
+    crud.record_user_connection(db, user, datetime.now())
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/users/acesslist/", response_model=List[schemas.RoomOverview], tags=['Users'])
@@ -162,6 +169,7 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
             smoke_sensor_reading=sensors.smoke_sensor_reading
         )
         access_list.append(entry)
+    crud.record_user_connection(db, user, datetime.now())
     return access_list
 
 @app.get("/admin/users/", response_model=List[schemas.User], tags=['Admin'])
