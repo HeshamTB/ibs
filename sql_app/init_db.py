@@ -47,7 +47,7 @@ def init_user():
     res = crud.set_user_last_token(db, user.username, token)
 
 def init_door():
-    iot_door = schemas.IotEntityCreate(bluetooth_mac="ff:ff:ff:ff",
+    iot_door = schemas.IotEntityCreate(bluetooth_mac="94:b9:7e:fb:57:1a",
                                        description="Iot Lab Door")
     door_exists = crud.get_iot_entity_by_bluetooth_mac(db, iot_door.bluetooth_mac)
     if door_exists: return
