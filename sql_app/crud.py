@@ -34,8 +34,9 @@ def get_user_by_username(db: Session, username: str) -> models.User:
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
-def get_access_log_for_door_by_door_mac(db: Session, bluetooth_mac : str):
-    return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.iot_dev_bluetooth_mac == bluetooth_mac).all()
+def get_access_log_for_door_by_door_mac(db: Session, iot_id: str):
+    return db.query(models.DoorAccessLog)\
+        .filter(models.DoorAccessLog.iot_id == iot_id).all()
 
 def get_access_log_for_user_by_id(db: Session, id : str):
     return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.user_id == id).all()
@@ -186,6 +187,6 @@ def record_user_connection(db: Session, user: models.User, time: datetime):
     db.commit()
     db.refresh(entry)
 
-def get_all_sensor_data_for_room(db: Session, room_id: int):
-    data = db.query(models.RoomSensorData).offset(0).limit(50).all()
+def get_sensor_data_for_room(db: Session, skip: int = 0, limit: int = 100):
+    data = db.query(models.RoomSensorData).offset(skip).limit(limit).all()
     return data

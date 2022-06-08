@@ -279,13 +279,6 @@ def generate_token_for_iot_device(bluetooth_mac : schemas.IotBluetoothMac,
     tkn = auth_helper.create_iot_dev_token(data)
     return {"access_token": tkn, "token_type": "bearer"}
 
-@app.post("/admin/iotdevice/accesslog/", tags=['Admin'])
-def get_access_log_for_door(request : schemas.AccessLogRequest,
-                            db : Session = Depends(get_db)):
-    device = crud.get_iot_entity_by_bluetooth_mac(db, request.bluetooth_mac)
-    if not device: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Iot Entity not found")
-    return crud.get_access_log_for_door_by_door_mac(db, request.bluetooth_mac)
-
 @app.post("/admin/user/accesslog/email/", tags=['Admin'])
 def get_access_log_history_for_user(request : schemas.UserAccessLogRequestEmail,
                                     db : Session = Depends(get_db)):
@@ -304,11 +297,19 @@ def get_access_log_history_for_user(request : schemas.UserAccessLogRequestUserna
 def get_room_data(db: Session = Depends(get_db)):
     return crud.get_room_data_now(db)
 
-@app.get("/admin/roominfo/history/sensors/{room_id}", tags=['Admin'])
-def get_all_sensor_history(room_id: int,
+@app.get("/admin/roominfo/history/sensors", tags=['Admin'])
+def get_all_sensor_history(skip: int = 0, limit: int = 100,
                            api_key: APIKey = Depends(auth_helper.valid_api_key),
                            db: Session = Depends(get_db)):
-    return crud.get_all_sensor_data_for_room(db, room_id)
+    return crud.get_sensor_data_for_room(db, skip, limit)
+
+@app.post("/admin/roominfo/accesslog", tags=['Admin'])
+def get_access_log_for_door(request : schemas.AccessLogRequest,
+                            api_key: APIKey = Depends(auth_helper.valid_api_key),
+                            db : Session = Depends(get_db)):
+    device = crud.get_iot_entity(db, request.iot_id)
+    if not device: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Iot Entity not found")
+    return crud.get_access_log_for_door_by_door_mac(db, request.iot_id)
 
 @app.post("/iotdevice/door/status", response_model=schemas.IotDoorPollingResponse, tags=['Iot'])
 def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,

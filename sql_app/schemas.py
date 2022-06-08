@@ -107,7 +107,7 @@ class DoorAccessLog(BaseModel):
         orm_mode = True
 
 class AccessLogRequest(BaseModel):
-    bluetooth_mac : str
+    iot_id : int
 
 class UserAccessLogRequestUsername(BaseModel):
     username : str
