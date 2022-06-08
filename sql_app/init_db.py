@@ -111,7 +111,6 @@ def init_user_connections():
               crud.get_user(db, 3)]
     
     for i in range(3):
-        print(users[i])
         crud.record_user_connection(db, users[i], datetime.now())
         crud.record_user_connection(db, users[i], datetime.now())
         crud.record_user_connection(db, users[i], datetime.now())

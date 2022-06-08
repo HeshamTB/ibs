@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from . import models, schemas, crypto, auth_helper
 
 from datetime import datetime
+from warnings import warn
 
 # TODO: Data we can collect or log
 #  - Last user connection (link to user)
@@ -35,6 +36,8 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 def get_access_log_for_door_by_door_mac(db: Session, iot_id: str):
+    warn("Manual access log read is deprecated. Use device.access_log",
+    DeprecationWarning, stacklevel=2)
     return db.query(models.DoorAccessLog)\
         .filter(models.DoorAccessLog.iot_id == iot_id).all()
 

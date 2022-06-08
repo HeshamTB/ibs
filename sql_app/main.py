@@ -303,13 +303,13 @@ def get_all_sensor_history(skip: int = 0, limit: int = 100,
                            db: Session = Depends(get_db)):
     return crud.get_sensor_data_for_room(db, skip, limit)
 
-@app.post("/admin/roominfo/accesslog", tags=['Admin'])
+@app.post("/admin/roominfo/accesslog",response_model=List[schemas.DoorAccessLog], tags=['Admin'])
 def get_access_log_for_door(request : schemas.AccessLogRequest,
                             api_key: APIKey = Depends(auth_helper.valid_api_key),
                             db : Session = Depends(get_db)):
-    device = crud.get_iot_entity(db, request.iot_id)
+    device: models.IotEntity = crud.get_iot_entity(db, request.iot_id)
     if not device: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Iot Entity not found")
-    return crud.get_access_log_for_door_by_door_mac(db, request.iot_id)
+    return device.access_log
 
 @app.post("/iotdevice/door/status", response_model=schemas.IotDoorPollingResponse, tags=['Iot'])
 def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
