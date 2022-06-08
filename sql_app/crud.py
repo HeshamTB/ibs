@@ -193,3 +193,9 @@ def record_user_connection(db: Session, user: models.User, time: datetime):
 def get_sensor_data_for_room(db: Session, skip: int = 0, limit: int = 100):
     data = db.query(models.RoomSensorData).offset(skip).limit(limit).all()
     return data
+
+def update_user_status(db: Session, user: models.User, state: bool):
+    user.is_active = state
+    db.add(user)
+    db.commit()
+    db.refresh(user)

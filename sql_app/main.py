@@ -266,11 +266,13 @@ def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequ
 
 @app.patch("/admin/users/{user_id}/deactiveate", tags=['Admin'])
 def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
-    return
+    user = crud.get_user(db, user_id)
+    crud.update_user_status(db, user, False)
 
 @app.patch("/admin/users/{user_id}/activeate", tags=['Admin'])
 def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
-    return
+    user = crud.get_user(db, user_id)
+    crud.update_user_status(db, user, True)
 
 @app.post("/admin/iotdevice/gentoken/", response_model=schemas.Token, tags=['Admin'])
 def generate_token_for_iot_device(bluetooth_mac : schemas.IotBluetoothMac, 
