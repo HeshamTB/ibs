@@ -285,14 +285,14 @@ def get_access_log_history_for_user(request : schemas.UserAccessLogRequestEmail,
                                     db : Session = Depends(get_db)):
     user = crud.get_user_by_email(db, request.email)
     if not user: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
-    return crud.get_access_log_for_user_by_id(db, user.id)
+    return user.access_log
 
 @app.post("/admin/user/accesslog/username/", tags=['Admin'])
 def get_access_log_history_for_user(request : schemas.UserAccessLogRequestUsername,
                                     db : Session = Depends(get_db)):
     user = crud.get_user_by_username(db, request.username)
     if not user: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
-    return crud.get_access_log_for_user_by_id(db, user.id)
+    return user.access_log
 
 @app.get("/admin/roominfo/now/", tags=['Admin'])
 def get_room_data(db: Session = Depends(get_db)):
