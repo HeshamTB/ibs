@@ -65,11 +65,6 @@ def init_allowance():
     crud.create_user_link_to_iot(db, 1, 1)
 
 def init_sensor_data():
-    # humidity : int
-    # people : int
-    # temperature : int
-    # smoke_sensor_reading : int
-    # token: str
     
     for i in range(50):
         room_data = \
@@ -82,11 +77,52 @@ def init_sensor_data():
                 token='dummy')
         crud.record_room_sensor_data(db, room_data)
     
+def init_open_close_requests():
+    user = crud.get_user_by_email(db, "hisham@banafa.com.sa")
+    crud.set_open_door_request(db, 1, 10)
+    log_entry = schemas.DoorAccessLog(user_id=user.id,
+                                             iot_id=1,
+                                             command="OPEN",
+                                             timestamp=datetime.now())
+    crud.record_door_access_log(db, log_entry)
 
+    log_entry = schemas.DoorAccessLog(user_id=user.id,
+                                             iot_id=1,
+                                             command="OPEN",
+                                             timestamp=datetime.now())
+    crud.record_door_access_log(db, log_entry)
+
+    log_entry = schemas.DoorAccessLog(user_id=user.id,
+                                                iot_id=1,
+                                                command="OPEN",
+                                                timestamp=datetime.now())
+    crud.record_door_access_log(db, log_entry)
+
+
+    log_entry = schemas.DoorAccessLog(user_id=user.id,
+                                             iot_id=1,
+                                             command="CLOSE",
+                                             timestamp=datetime.now())
+    crud.record_door_access_log(db, log_entry)
+
+def init_user_connections():
+    users = [ crud.get_user(db, 1),
+              crud.get_user(db, 2),
+              crud.get_user(db, 3)]
+    
+    for i in range(3):
+        print(users[i])
+        crud.record_user_connection(db, users[i], datetime.now())
+        crud.record_user_connection(db, users[i], datetime.now())
+        crud.record_user_connection(db, users[i], datetime.now())
+    
+    
 def init():
     init_user()
     init_door()
     init_monitor()
     init_allowance()
     init_sensor_data()
+    init_open_close_requests()
+    init_user_connections()
     
