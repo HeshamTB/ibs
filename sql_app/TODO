@@ -2,6 +2,7 @@
 - [x] Issue requests from Lap to Pi or vica versa
 - [x] Decide HTTP vs MQTT vs CoAP
 - [x] Hash passwords
+- [x] Salt passwords
 - [x] User registraion
 - [x] User login in API
 	- [x] JWT token access
@@ -12,8 +13,8 @@
 - [X] Expose door lock function
 - [X] Record access log
 - [X] Expose data analysis
-- [ ] Load backend onto RPi
-- [ ] Test connections in lab network
+- [X] Load backend onto RPi
+- [X] Test connections in lab network
 - [ ] Define emrgancy triggers (manual and automatic)
 - [ ] Expose temporary control in case of emergancy
         - Triggers
@@ -26,6 +27,15 @@
 - [X] Issue door open command
 - [X] Make functions to gen a IotEntity token
 - [ ] Write a small program/script to generate new Iot token and add new Iot Device into database
-- [ ] Make inital database entries automatic for easy reset
+- [X] Make inital database entries automatic for easy reset
+- [X] Expose access list endpoint for doors
+- [X] Access list coutner for iot door
+- [X] Force close in middle of timed open request
+- [ ] Record user connections and time
+- [ ] Record Iot dev connection and time
+- [ ] Write unit tests
+- [ ] Develop a program to visualize the data
+- [ ] CLI frontend
+
 
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJibHVldG9vdGhfbWFjIjoic3RyaW5nIn0.ELl5AfBR1NdM4_OFhl_SCTm9EMPpqjiCKOSS0CrOJps

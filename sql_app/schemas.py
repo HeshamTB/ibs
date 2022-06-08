@@ -60,6 +60,9 @@ class UserAllowForIotEntityRequestByUsername(BaseModel):
     username: str
     description: str
 
+class UserUpdatePassword(BaseModel):
+    password: str
+
 class OpenDoorRequestBase(BaseModel):
     username: str
     bluetooth_mac: str
@@ -74,8 +77,6 @@ class IotDoorPollingRequest(BaseModel):
     bluetooth_mac : str
     state: int
     token : str
-    class Config:
-        orm_mode = True
 
 class IotDoorPollingResponse(BaseModel):
     open_command : bool
@@ -106,7 +107,7 @@ class DoorAccessLog(BaseModel):
         orm_mode = True
 
 class AccessLogRequest(BaseModel):
-    bluetooth_mac : str
+    iot_id : int
 
 class UserAccessLogRequestUsername(BaseModel):
     username : str

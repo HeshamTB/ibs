@@ -16,7 +16,8 @@ class User(Base):
     last_token = Column(String, nullable=True)
     connections = relationship("UserConnectionHistory")
     authorized_devices = relationship("IotEntity", secondary="user_iot_link", back_populates="authorized_users")
-
+    connections = relationship("UserConnectionHistory")
+    access_log = relationship("DoorAccessLog", back_populates="user")
 
 class IotEntity(Base):
     __tablename__ = "iot_entities"
@@ -30,6 +31,7 @@ class IotEntity(Base):
     force_close = Column(Boolean, default=False)
     state = Column(Boolean, default=False) # True is open, False is closed
     authorized_users = relationship("User", secondary="user_iot_link", back_populates="authorized_devices")
+    access_log = relationship("DoorAccessLog", back_populates="iot_device")
 
 class UserAuthToIoTDev(Base):
     __tablename__ = "user_iot_link"
@@ -42,8 +44,10 @@ class DoorAccessLog(Base):
     __tablename__ = "door_access_log"
 
     entry_id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('user_accounts.id'))
-    iot_id = Column(Integer, ForeignKey('iot_entities.id'))
+    user_id = Column(Integer, ForeignKey('user_accounts.id'), index=True)
+    user = relationship("User", back_populates="access_log")
+    iot_id = Column(Integer, ForeignKey('iot_entities.id'), index=True)
+    iot_device = relationship("IotEntity", back_populates="access_log")
     command = Column(String(16))
     timestamp = Column(DateTime)
 
@@ -62,7 +66,7 @@ class UserConnectionHistory(Base):
     __tablename__ = "user_connection_history"
 
     reading_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer,ForeignKey("user_accounts.id"), index=True)
+    user_id = Column(Integer, ForeignKey("user_accounts.id"), index=True)
     timestamp = Column(DateTime)
     # TODO: add ip
 

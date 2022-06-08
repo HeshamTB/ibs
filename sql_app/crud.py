@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from . import models, schemas, crypto, auth_helper
 
 from datetime import datetime
+from warnings import warn
 
 # TODO: Data we can collect or log
 #  - Last user connection (link to user)
@@ -34,8 +35,11 @@ def get_user_by_username(db: Session, username: str) -> models.User:
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
-def get_access_log_for_door_by_door_mac(db: Session, bluetooth_mac : str):
-    return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.iot_dev_bluetooth_mac == bluetooth_mac).all()
+def get_access_log_for_door_by_door_mac(db: Session, iot_id: str):
+    warn("Manual access log read is deprecated. Use device.access_log",
+    DeprecationWarning, stacklevel=2)
+    return db.query(models.DoorAccessLog)\
+        .filter(models.DoorAccessLog.iot_id == iot_id).all()
 
 def get_access_log_for_user_by_id(db: Session, id : str):
     return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.user_id == id).all()
@@ -55,6 +59,16 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def update_user_password(db: Session, user: models.User, request: schemas.UserUpdatePassword):
+    key = crypto.gen_new_key(request.password)
+    salt = key[1]
+    hashed_pass = key[0]
+    user.passwd_salt = salt
+    user.hashed_password = hashed_pass
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
 def get_iot_entities(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.IotEntity).offset(skip).limit(limit).all()
@@ -175,3 +189,13 @@ def record_user_connection(db: Session, user: models.User, time: datetime):
     db.add(entry)
     db.commit()
     db.refresh(entry)
+
+def get_sensor_data_for_room(db: Session, skip: int = 0, limit: int = 100):
+    data = db.query(models.RoomSensorData).offset(skip).limit(limit).all()
+    return data
+
+def update_user_status(db: Session, user: models.User, state: bool):
+    user.is_active = state
+    db.add(user)
+    db.commit()
+    db.refresh(user)
