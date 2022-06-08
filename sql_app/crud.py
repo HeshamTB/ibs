@@ -185,3 +185,7 @@ def record_user_connection(db: Session, user: models.User, time: datetime):
     db.add(entry)
     db.commit()
     db.refresh(entry)
+
+def get_all_sensor_data_for_room(db: Session, room_id: int):
+    data = db.query(models.RoomSensorData).offset(0).limit(50).all()
+    return data

@@ -204,7 +204,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
                             detail="User not found")
     return db_user
 
-@app.post("/admin/users/allowdevice/id", tags=['Admin'])
+@app.patch("/admin/users/allowdevice/id", tags=['Admin'])
 def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
@@ -224,7 +224,7 @@ def allow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReques
     crud.increment_door_access_list_counter(db, iot_entity)
     return
 
-@app.post("/admin/users/disallowdevice/id", tags=['Admin'])
+@app.patch("/admin/users/disallowdevice/id", tags=['Admin'])
 def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityRequestByID, db: Session = Depends(get_db)):
     user = crud.get_user(db, request.user_id)
     if not user:
@@ -244,7 +244,7 @@ def disallow_user_for_iot_entity_by_id(request: schemas.UserAllowForIotEntityReq
     crud.increment_door_access_list_counter(db, iot_entity)
     return
 
-@app.post("/admin/users/allowdevice/name", tags=['Admin'])
+@app.patch("/admin/users/allowdevice/name", tags=['Admin'])
 def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequestByUsername, db: Session = Depends(get_db)):
     user = crud.get_user_by_username(db, request.username)
     if not user:
@@ -263,11 +263,11 @@ def allow_user_for_iot_entity_by_name(request: schemas.UserAllowForIotEntityRequ
 
     return
 
-@app.post("/admin/users/{user_id}/deactiveate", tags=['Admin'])
+@app.patch("/admin/users/{user_id}/deactiveate", tags=['Admin'])
 def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
     return
 
-@app.post("/admin/users/{user_id}/activeate", tags=['Admin'])
+@app.patch("/admin/users/{user_id}/activeate", tags=['Admin'])
 def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
     return
 
@@ -303,6 +303,12 @@ def get_access_log_history_for_user(request : schemas.UserAccessLogRequestUserna
 @app.get("/admin/roominfo/now/", tags=['Admin'])
 def get_room_data(db: Session = Depends(get_db)):
     return crud.get_room_data_now(db)
+
+@app.get("/admin/roominfo/history/sensors/{room_id}", tags=['Admin'])
+def get_all_sensor_history(room_id: int,
+                           api_key: APIKey = Depends(auth_helper.valid_api_key),
+                           db: Session = Depends(get_db)):
+    return crud.get_all_sensor_data_for_room(db, room_id)
 
 @app.post("/iotdevice/door/status", response_model=schemas.IotDoorPollingResponse, tags=['Iot'])
 def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
