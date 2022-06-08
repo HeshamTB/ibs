@@ -149,7 +149,8 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
             humidity=sensors.humidity,
             people=sensors.people,
             temperature=sensors.temperature,
-            smoke_sensor_reading=sensors.smoke_sensor_reading
+            smoke_sensor_reading=sensors.smoke_sensor_reading,
+            force_close=dev_db.force_close
         )
         access_list.append(entry)
     #crud.record_user_connection(db, user, datetime.now())
