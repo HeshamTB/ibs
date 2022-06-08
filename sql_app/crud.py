@@ -56,6 +56,16 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
+def update_user_password(db: Session, user: models.User, request: schemas.UserUpdatePassword):
+    key = crypto.gen_new_key(request.password)
+    salt = key[1]
+    hashed_pass = key[0]
+    user.passwd_salt = salt
+    user.hashed_password = hashed_pass
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
 def get_iot_entities(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.IotEntity).offset(skip).limit(limit).all()
 

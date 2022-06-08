@@ -130,24 +130,6 @@ def issue_close_door_command(command: schemas.CloseDoorRequest,
 
             return device
 
-@app.post("/users/tkn", response_model=schemas.Token, tags=['Users'])
-@app.post("/tkn", response_model=schemas.Token, tags=['Users'])
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = auth_helper.authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    #access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = auth_helper.create_access_token(
-        data={"sub": form_data.username}, expires_delta=timedelta(minutes=15)
-    )
-    crud.set_user_last_token(db, form_data.username, access_token)
-    #crud.record_user_connection(db, user, datetime.now())
-    return {"access_token": access_token, "token_type": "bearer"}
-
 @app.get("/users/acesslist/", response_model=List[schemas.RoomOverview], tags=['Users'])
 def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_active_user)):
     user = crud.get_user_by_username(db, current_user.username)
@@ -172,6 +154,31 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
         access_list.append(entry)
     #crud.record_user_connection(db, user, datetime.now())
     return access_list
+
+@app.patch("/users/updatepassword", tags=['Users'])
+def change_user_password(request: schemas.UserUpdatePassword,
+                         current_user: models.User = Depends(get_current_active_user), 
+                         db: Session = Depends(get_db)):
+    crud.update_user_password(db, current_user, request)
+    return
+
+@app.post("/users/tkn", response_model=schemas.Token, tags=['Users'])
+@app.post("/tkn", response_model=schemas.Token, tags=['Users'])
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = auth_helper.authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    #access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = auth_helper.create_access_token(
+        data={"sub": form_data.username}, expires_delta=timedelta(minutes=15)
+    )
+    crud.set_user_last_token(db, form_data.username, access_token)
+    #crud.record_user_connection(db, user, datetime.now())
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/admin/users/", response_model=List[schemas.User], tags=['Admin'])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
