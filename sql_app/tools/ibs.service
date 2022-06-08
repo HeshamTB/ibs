@@ -1,0 +1,31 @@
+# This is templte to use for python venv applications
+# from https://broplanner.com/wp-content/webpc-passthru.php?src=https://broplanner.com/wp-content/uploads/2022/01/Screenshot-2022-01-25-224223-1536x237.png&nocache=1 
+[Unit]
+After = network.target
+
+[Service]
+User=ibs
+Group=ibs
+WorkingDirectory=/srv/ibs/ibs
+ExecStart=/srv/ibs/ibs/run-tls
+
+Restart=on-failure
+RestartSec=15
+
+# Security
+ReadWritePaths=/srv/ibs/ibs
+PrivateDevices=yes
+PrivateMounts=yes
+PrivateTmp=yes
+PrivateUsers=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=yes
+ProtectHostname=yes
+
+[Install]
+WantedBy=multi-user.target
