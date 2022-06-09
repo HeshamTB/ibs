@@ -28,11 +28,32 @@ class IotEntity(IotEntityBase):
     time_seconds: int
     force_close: bool
     acces_list_counter: int
+    state: bool
     class Config:
         orm_mode = True
 
 class IotBluetoothMac(BaseModel):
     bluetooth_mac : str
+
+class Monitor(IotEntityBase):
+    # bluetooth_mac: str
+    # description: str
+    id: int
+    bluetooth_mac: str 
+    description: str
+    humidity: int 
+    people: int
+    temperature: int
+    smoke_sensor_reading: int 
+    class Config:
+        orm_mode = True 
+
+class MonitorUpdateReadings(BaseModel):
+    humidity : int
+    people : int
+    temperature : int
+    smoke_sensor_reading : int
+    token: str # Contains mac
 
 class User(UserBase):
     id: int
@@ -90,8 +111,8 @@ class IotMonitorRoomInfo(BaseModel):
     temperature : int
     smoke_sensor_reading : int
     token: str
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
 
 class IotMonitorRoomInfoTimestamped(IotMonitorRoomInfo):
     time: datetime

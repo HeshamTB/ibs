@@ -17,7 +17,7 @@ from warnings import warn
 def get_user(db: Session, user_id: int) -> models.User:
     return db.query(models.User).get(user_id)
 
-def get_iot_entity(db: Session, id: int):
+def get_iot_entity(db: Session, id: int) -> models.IotEntity:
     return db.query(models.IotEntity).get(id)
 
 def get_iot_entity_by_description(db: Session, description: str):
@@ -44,8 +44,12 @@ def get_access_log_for_door_by_door_mac(db: Session, iot_id: str):
 def get_access_log_for_user_by_id(db: Session, id : str):
     return db.query(models.DoorAccessLog).filter(models.DoorAccessLog.user_id == id).all()
 
-def get_room_data_now(db: Session) -> models.RoomSensorData:
-    return db.query(models.RoomSensorData)[-1]
+# def get_room_data_now(db: Session, door_id: int) -> models.RoomSensorData:
+#     door = get_iot_entity(db, door_id)
+#     monitor : models.Monitors = door.monitor
+#     if not monitor: return -1
+#     if len(monitor.sensor_history) == 0: return -2
+#     return monitor.sensor_history[-1]
 
 def create_user(db: Session, user: schemas.UserCreate):
     key = crypto.gen_new_key(user.password)
@@ -73,6 +77,8 @@ def update_user_password(db: Session, user: models.User, request: schemas.UserUp
 def get_iot_entities(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.IotEntity).offset(skip).limit(limit).all()
 
+def get_monitors(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Monitors).offset(skip).limit(limit).all()
 
 def create_iot_entity(db: Session, iot_entity: schemas.IotEntityCreate):
     db_item = models.IotEntity(bluetooth_mac=iot_entity.bluetooth_mac,
@@ -81,6 +87,37 @@ def create_iot_entity(db: Session, iot_entity: schemas.IotEntityCreate):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def create_monitor(db: Session, monitor: schemas.IotEntityBase):
+    db_item = models.Monitors(bluetooth_mac=monitor.bluetooth_mac,
+                              description=monitor.description)
+
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+def get_monitor(db: Session, id: int) -> models.Monitors:
+    return db.query(models.Monitors).get(id)
+
+def get_monitor_bluetooth(db: Session, bluetooth_mac: str) -> models.Monitors:
+    return db.query(models.Monitors).filter(models.Monitors.bluetooth_mac == bluetooth_mac).first()
+
+def update_monitor(db: Session, monitor: models.Monitors):
+    db.add(monitor)
+    db.commit()
+    db.refresh(monitor)
+
+def update_monitor_readings(db: Session, monitor_upadte: schemas.MonitorUpdateReadings, bluetooth_mac: str):
+    monitor = get_monitor_bluetooth(db, bluetooth_mac)
+    monitor.humidity = monitor_upadte.humidity
+    monitor.people = monitor_upadte.people
+    monitor.smoke_sensor_reading = monitor_upadte.smoke_sensor_reading
+    monitor.temperature = monitor_upadte.temperature
+    
+    db.add(monitor)
+    db.commit()
+    db.refresh(monitor)
 
 def create_user_link_to_iot(db: Session, user_id: int, iot_dev_id: int):
     # Ensure link is not already present and it does not allow duplicates
@@ -168,12 +205,14 @@ def record_door_access_log(db: Session, entry: schemas.DoorAccessLog):
     db.commit()
     db.refresh(db_item)
 
-def record_room_sensor_data(db: Session, entry: schemas.IotMonitorRoomInfo):
+def record_room_sensor_data(db: Session, entry: schemas.MonitorUpdateReadings, 
+                            monitor :models.Monitors):
     db_item = models.RoomSensorData(humidity=entry.humidity,
                                     people=entry.people,
                                     temperature=entry.temperature,
                                     smoke_sensor_reading=entry.smoke_sensor_reading,
-                                    timestamp=datetime.now())
+                                    timestamp=datetime.now(),
+                                    monitor_id=monitor.id)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -190,9 +229,10 @@ def record_user_connection(db: Session, user: models.User, time: datetime):
     db.commit()
     db.refresh(entry)
 
-def get_sensor_data_for_room(db: Session, skip: int = 0, limit: int = 100):
-    data = db.query(models.RoomSensorData).offset(skip).limit(limit).all()
-    return data
+# def get_sensor_data_for_room(db: Session, monitor_id: int, count_last: int):
+#     data = db.query(models.RoomSensorData).all()
+#     if not data or len(data) == 0: return -1
+#     return data[-count_last]
 
 def update_user_status(db: Session, user: models.User, state: bool):
     user.is_active = state

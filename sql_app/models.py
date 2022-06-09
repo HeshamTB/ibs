@@ -23,7 +23,7 @@ class IotEntity(Base):
     __tablename__ = "iot_entities"
 
     id = Column(Integer, primary_key=True, index=True)
-    bluetooth_mac = Column(String(512))
+    bluetooth_mac = Column(String(512), index=True, unique=True)
     description = Column(String(512))
     open_request = Column(Boolean, default=False)
     time_seconds = Column(Integer, default=10)
@@ -31,7 +31,22 @@ class IotEntity(Base):
     force_close = Column(Boolean, default=False)
     state = Column(Boolean, default=False) # True is open, False is closed
     authorized_users = relationship("User", secondary="user_iot_link", back_populates="authorized_devices")
-    access_log = relationship("DoorAccessLog", back_populates="iot_device")
+    access_log = relationship("DoorAccessLog", back_populates="iot_device") # one-to-many
+    monitor = relationship("Monitors", back_populates="door", uselist=False) # one-to-one
+
+class Monitors(Base):
+    __tablename__ = "monitors"
+
+    id = Column(Integer, primary_key=True)
+    bluetooth_mac = Column(String(512), index=True, unique=True)
+    description = Column(String(512))
+    humidity = Column(Integer, default=0)
+    people = Column(Integer, default=0)
+    temperature = Column(Integer, default=0)
+    smoke_sensor_reading = Column(Integer, default=0)
+    door_id = Column(Integer, ForeignKey("iot_entities.id"))
+    door = relationship("IotEntity", back_populates="monitor")
+    sensor_history = relationship("RoomSensorData", back_populates="monitor")
 
 class UserAuthToIoTDev(Base):
     __tablename__ = "user_iot_link"
@@ -61,6 +76,8 @@ class RoomSensorData(Base):
     temperature = Column(Integer)
     smoke_sensor_reading = Column(Integer)
     timestamp = Column(DateTime)
+    monitor_id = Column(Integer, ForeignKey("monitors.id"), index=True)
+    monitor = relationship("Monitors", back_populates="sensor_history")
 
 class UserConnectionHistory(Base):
     __tablename__ = "user_connection_history"

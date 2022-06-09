@@ -57,15 +57,15 @@ def init_door():
 def init_monitor():
     iot_monitor = schemas.IotEntityCreate(bluetooth_mac="ff:ff:00:ff",
                                           description="Iot Lab Monitor")
-    monitor_exists = crud.get_iot_entity_by_bluetooth_mac(db, iot_monitor.bluetooth_mac)
+    monitor_exists = crud.get_monitor_bluetooth(db, iot_monitor.bluetooth_mac)
     if monitor_exists: return
-    crud.create_iot_entity(db, iot_monitor)
+    crud.create_monitor(db, iot_monitor)
 
 def init_allowance():
     crud.create_user_link_to_iot(db, 1, 1)
 
 def init_sensor_data():
-    
+    monitor = crud.get_monitor(db, 1)
     for i in range(50):
         room_data = \
             schemas.\
@@ -75,7 +75,7 @@ def init_sensor_data():
                 temperature=randint(18, 27),
                 smoke_sensor_reading=randint(150, 700),
                 token='dummy')
-        crud.record_room_sensor_data(db, room_data)
+        crud.record_room_sensor_data(db, room_data, monitor)
     
 def init_open_close_requests():
     user = crud.get_user_by_email(db, "hisham@banafa.com.sa")
@@ -114,7 +114,12 @@ def init_user_connections():
         crud.record_user_connection(db, users[i], datetime.now())
         crud.record_user_connection(db, users[i], datetime.now())
         crud.record_user_connection(db, users[i], datetime.now())
-    
+
+def init_link_room_monitor():
+    monitor = crud.get_monitor(db, 1)
+    door = crud.get_iot_entity(db, 1)
+    monitor.door = door
+    crud.update_monitor(db, monitor)
     
 def init():
     init_user()
@@ -124,4 +129,5 @@ def init():
     init_sensor_data()
     init_open_close_requests()
     init_user_connections()
+    init_link_room_monitor()
     

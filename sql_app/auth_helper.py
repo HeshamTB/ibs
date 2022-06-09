@@ -56,3 +56,13 @@ def valid_iot_token(token : str, db: Session):
     mac_signed = payload.get("bluetooth_mac")
     device = crud.get_iot_entity_by_bluetooth_mac(db, mac_signed)
     return device
+
+def valid_monitor_token(token: str, db: Session):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGO])
+    except jwt.DecodeError:
+        return None
+    
+    mac_signed = payload.get("bluetooth_mac")
+    monitor = crud.get_monitor_bluetooth(db, mac_signed)
+    return monitor

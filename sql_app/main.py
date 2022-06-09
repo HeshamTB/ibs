@@ -135,22 +135,23 @@ def get_iot_access_list_for_user(db: Session = Depends(get_db), current_user: sc
     user = crud.get_user_by_username(db, current_user.username)
     access_list = list()
     for device in user.authorized_devices:
-        dev_db : models.IotEntity = device
-        sensors = crud.get_room_data_now(db)
-        if not sensors: raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        door : models.IotEntity = device
+        monitor : models.Monitors = door.monitor
+        if not monitor: raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                             detail="No Room link")
         entry : schemas.RoomOverview = schemas.RoomOverview(
-            id=dev_db.id,
-            description=dev_db.description,
-            bluetooth_mac=dev_db.bluetooth_mac,
-            open_request=dev_db.open_request,
-            time_seconds=dev_db.time_seconds,
-            acces_list_counter=dev_db.acces_list_counter,
-            humidity=sensors.humidity,
-            people=sensors.people,
-            temperature=sensors.temperature,
-            smoke_sensor_reading=sensors.smoke_sensor_reading,
-            force_close=dev_db.force_close
+            id=door.id,
+            description=door.description,
+            bluetooth_mac=door.bluetooth_mac,
+            open_request=door.open_request,
+            time_seconds=door.time_seconds,
+            acces_list_counter=door.acces_list_counter,
+            humidity=monitor.humidity,
+            people=monitor.people,
+            temperature=monitor.temperature,
+            smoke_sensor_reading=monitor.smoke_sensor_reading,
+            force_close=door.force_close,
+            state=door.state
         )
         access_list.append(entry)
     #crud.record_user_connection(db, user, datetime.now())
@@ -191,11 +192,22 @@ def read_iot_entities(skip: int = 0, limit: int = 100, db: Session = Depends(get
     iot_entities = crud.get_iot_entities(db, skip=skip, limit=limit)
     return iot_entities
 
+@app.get("/admin/monitors/", response_model=List[schemas.Monitor], tags=['Admin'])
+def read_iot_monitors(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    monitors = crud.get_monitors(db, skip=skip, limit=limit)
+    return monitors
+
 # TODO: Can duplicate
 @app.post("/admin/iotentities/create", response_model=schemas.IotEntity, tags=['Admin'])
 def create_iot_entities(iot_entity: schemas.IotEntityCreate, db: Session = Depends(get_db)):
     iot_entities = crud.create_iot_entity(db, iot_entity)
     return iot_entities
+
+@app.post("/admin/monitor/create", response_model=schemas.Monitor, tags=['Admin'])
+def create_monitor(iot_entity: schemas.IotEntityBase,
+                   db: Session = Depends(get_db)):
+    monitor = crud.create_monitor(db, iot_entity)
+    return monitor
 
 @app.get("/admin/users/{user_id}", response_model=schemas.User, tags=['Admin'])
 def read_user(user_id: int, db: Session = Depends(get_db)):
@@ -275,12 +287,21 @@ def deactiveate_user(user_id: int, db:Session = Depends(get_db)):
     crud.update_user_status(db, user, True)
 
 @app.post("/admin/iotdevice/gentoken/", response_model=schemas.Token, tags=['Admin'])
-def generate_token_for_iot_device(bluetooth_mac : schemas.IotBluetoothMac, 
-                                  api_key: APIKey = Depends(auth_helper.valid_api_key)):
+def generate_token_for_iot_device(bluetooth_mac : schemas.IotBluetoothMac):
+    # api_key: APIKey = Depends(auth_helper.valid_api_key)
     # We get here after a valid admin key, so send back permenant token
     data = {"bluetooth_mac": bluetooth_mac.bluetooth_mac}
     tkn = auth_helper.create_iot_dev_token(data)
     return {"access_token": tkn, "token_type": "bearer"}
+
+@app.patch("/admin/link/monitor/{monitor_id}/door/{door_id}", tags=['Admin'])
+def link_monitor_with_door(monitor_id: int, door_id: int,
+                           db: Session = Depends(get_db)):
+    monitor = crud.get_monitor(db, monitor_id)
+    door = crud.get_iot_entity(db, door_id)
+    monitor.door = door
+    crud.update_monitor(db, monitor)
+    return monitor
 
 @app.post("/admin/user/accesslog/email/", tags=['Admin'])
 def get_access_log_history_for_user(request : schemas.UserAccessLogRequestEmail,
@@ -296,14 +317,49 @@ def get_access_log_history_for_user(request : schemas.UserAccessLogRequestUserna
     if not user: raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
     return user.access_log
 
-@app.get("/admin/roominfo/now/", tags=['Admin'])
-def get_room_data(db: Session = Depends(get_db)):
-    return crud.get_room_data_now(db)
+@app.get("/admin/roominfo/{door_id}/now", tags=['Admin'])
+def get_room_data(door_id: int, db: Session = Depends(get_db)):
+    door = crud.get_iot_entity(db, door_id)
+    if not door: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                            detail="Door not found")
+    monitor : models.Monitors = door.monitor
+    if not monitor: 
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                            detail="No Room link")
+    data = monitor.sensor_history
+    if not data or len(data) == 0: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                            detail="No Sensor data")
+    return data[-1]
 
-@app.get("/admin/roominfo/history/sensors", tags=['Admin'])
-def get_all_sensor_history(skip: int = 0, limit: int = 100,
+@app.get("/admin/roominfo/{monitor_id}/now", tags=['Admin'])
+def get_room_data(monitor_id: int, db: Session = Depends(get_db)):
+    monitor = crud.get_monitor(db, monitor_id)
+    if not monitor: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                            detail="Monitor not found")
+    if not monitor.door_id: 
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                            detail="Monitor not linked")
+        
+    data = crud.get_room_data_now(db, monitor.door_id)
+    if data == -1: raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                            detail="No Room link")
+    if data == -2: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                            detail="No Sensor data")
+    return data
+
+@app.get("/admin/roominfo/{monitor_id}/last/{count}", tags=['Admin'])
+def get_all_sensor_history(monitor_id: int, count: int,
                            db: Session = Depends(get_db)):
-    return crud.get_sensor_data_for_room(db, skip, limit)
+    monitor = crud.get_monitor(db, monitor_id)
+    if not monitor: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                            detail="Monitor not found")
+    data = monitor.sensor_history
+    if not data or len(data) == 0: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                            detail="No Sensor data")
+    return data[-count:]
 
 @app.post("/admin/roominfo/accesslog",response_model=List[schemas.DoorAccessLog], tags=['Admin'])
 def get_access_log_for_door(request : schemas.AccessLogRequest,
@@ -335,14 +391,14 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
     return response
 
 @app.post("/iotdevice/monitor/status", tags=['Iot'])
-def polling_method_for_room_monitor(request: schemas.IotMonitorRoomInfo,
+def polling_method_for_room_monitor(request: schemas.MonitorUpdateReadings,
                                     db: Session = Depends(get_db)):
-    device : schemas.IotEntity = auth_helper.valid_iot_token(request.token, db)
+    device : schemas.Monitor = auth_helper.valid_monitor_token(request.token, db)
     if not device:
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials")
-    crud.record_room_sensor_data(db, request)
+    crud.record_room_sensor_data(db, request, device)
     return request
 
 @app.post("/iotdevice/door/users", response_class=PlainTextResponse, tags=['Iot'])
@@ -376,3 +432,9 @@ def get_allowed_usernames(request: schemas.IotDoorPollingRequest,
         tkns = tkns + db_user.last_token + '\n'
     
     return tkns
+
+@app.get("/test")
+def get(db: Session = Depends(get_db)):
+    mon = crud.get_monitor(db, "ff:ff:ff:ff")
+    
+    return mon.door
