@@ -1,0 +1,37 @@
+{% extends "_base.html" %}
+
+{% block content %}
+
+<div class="starter-template">
+  <h1>IoT Building System</h1>
+  <hr><br>
+  <div>
+    <h3>Task</h3>
+    <p>Login</p>
+    <div class="login_form" role="group" aria-label="Basic example">
+        <form>
+            <input type="text" id="username_box" placeholder="Username">
+            <input type="password" id="password_box" placeholder="Password">
+            <input type="button"value="Login" class="btn btn-primary" onclick="handleLogInClick()">
+        </form>
+    </div>
+  </div>
+  <br><br>
+  <div>
+    <h3>Task Status</h3>
+    <br>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Status</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="tasks">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

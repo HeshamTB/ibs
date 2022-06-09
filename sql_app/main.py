@@ -1,7 +1,9 @@
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, OAuth2AuthorizationCodeBearer
 from fastapi.security.api_key import APIKey
 from fastapi.responses import PlainTextResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas, auth_helper, init_db
@@ -16,11 +18,16 @@ models.Base.metadata.create_all(bind=engine)
 oauth = OAuth2PasswordBearer(tokenUrl="tkn")
 
 app = FastAPI(title="IoT Building System")
+app.mount("/sql_app/static", StaticFiles(directory="sql_app/static"), name="static")
+templates = Jinja2Templates(directory="sql_app/templates")
 
 # Split into endpoints modules
 #app.include_router(users.router,prefix="/users", tags=["User"])
 init_db.init()
 
+@app.get("/")
+def home(request: Request):
+    return templates.TemplateResponse("home.html", context={"request": request})
 
 def get_current_user(token: str = Depends(oauth), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
