@@ -104,6 +104,7 @@ class IotDoorPollingResponse(BaseModel):
     acces_list_counter : int
     time_seconds : int
     force_close: bool
+    state: bool
 
 class IotMonitorRoomInfo(BaseModel):
     humidity : int

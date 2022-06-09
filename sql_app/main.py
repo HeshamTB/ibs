@@ -382,11 +382,12 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
                                                 open_command=device.open_request,
                                                 acces_list_counter=device.acces_list_counter,
                                                 time_seconds=device.time_seconds,
-                                                force_close=device.force_close)
+                                                force_close=device.force_close,
+                                                state=device.state)
     # Reset open_request to False
     crud.clear_open_door_request(db, device.id)
     crud.clear_close_door_request(db, device.id)
-    crud.set_door_state(db, device, device.state)
+    crud.set_door_state(db, device, bool(request.state))
 
     return response
 
