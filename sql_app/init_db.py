@@ -55,7 +55,7 @@ def init_door():
     crud.create_iot_entity(db, iot_door)
 
 def init_monitor():
-    iot_monitor = schemas.IotEntityCreate(bluetooth_mac="ff:ff:00:ff",
+    iot_monitor = schemas.IotEntityCreate(bluetooth_mac="ff:ff:ff",
                                           description="Iot Lab Monitor")
     monitor_exists = crud.get_monitor_bluetooth(db, iot_monitor.bluetooth_mac)
     if monitor_exists: return
