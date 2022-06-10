@@ -400,6 +400,7 @@ def polling_method_for_room_monitor(request: schemas.MonitorUpdateReadings,
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials")
     crud.record_room_sensor_data(db, request, device)
+    print(request)
     return request
 
 @app.post("/iotdevice/door/users", response_class=PlainTextResponse, tags=['Iot'])
