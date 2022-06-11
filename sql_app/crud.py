@@ -217,6 +217,15 @@ def record_room_sensor_data(db: Session, entry: schemas.MonitorUpdateReadings,
     db.commit()
     db.refresh(db_item)
 
+    monitor.humidity = entry.humidity
+    monitor.temperature = entry.temperature
+    monitor.people = entry.people
+    monitor.smoke_sensor_reading = entry.smoke_sensor_reading
+
+    db.add(monitor)
+    db.commit()
+    db.refresh(monitor)
+
 def increment_door_access_list_counter(db: Session, iot_entity: models.IotEntity):
     iot_entity.acces_list_counter = iot_entity.acces_list_counter + 1
     db.add(iot_entity)

@@ -401,8 +401,9 @@ def polling_method_for_room_monitor(request: schemas.MonitorUpdateReadings,
         detail="Could not validate credentials")
     crud.record_room_sensor_data(db, request, device)
     if request.temperature >= EMERG_TEMP or request.smoke_sensor_reading >= EMERG_SMOKE:
-        crud.record_emergancy_entry(db, request, device.id)
         print("********EMERGENCY AT %s********" % device.description)
+        # TODO: Get door, and open
+        crud.record_emergancy_entry(db, request, device.id)
         # Call into a hook to notify with room and people
         
     print(request)
