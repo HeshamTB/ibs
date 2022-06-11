@@ -239,3 +239,15 @@ def update_user_status(db: Session, user: models.User, state: bool):
     db.add(user)
     db.commit()
     db.refresh(user)
+
+def record_emergancy_entry(db: Session, monitor_data: schemas.MonitorUpdateReadings, monitor_id: int):
+    new_entry : models.EmergancyNotice = models.EmergancyNotice(
+        monitor_id=monitor_id,
+        people=monitor_data.people,
+        temperature=monitor_data.temperature,
+        smoke_sensor_reading=monitor_data.smoke_sensor_reading,
+        timestamp=datetime.now()
+    )
+    db.add(new_entry)
+    db.commit()
+    db.refresh(new_entry)

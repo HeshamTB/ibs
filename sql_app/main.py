@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from . import crud, models, schemas, auth_helper, init_db
 from .database import SessionLocal, engine
-from .utils import get_db
+from .utils import get_db, EMERG_SMOKE, EMERG_TEMP
 
 from typing import List
 from datetime import timedelta, datetime
@@ -400,6 +400,11 @@ def polling_method_for_room_monitor(request: schemas.MonitorUpdateReadings,
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials")
     crud.record_room_sensor_data(db, request, device)
+    if request.temperature >= EMERG_TEMP or request.smoke_sensor_reading >= EMERG_SMOKE:
+        crud.record_emergancy_entry(db, request, device.id)
+        print("********EMERGENCY AT %s********" % device.description)
+        # Call into a hook to notify with room and people
+        
     print(request)
     return request
 

@@ -7,3 +7,6 @@ def get_db():
         yield db
     finally:
         db.close()
+
+EMERG_TEMP = 50
+EMERG_SMOKE = 1000

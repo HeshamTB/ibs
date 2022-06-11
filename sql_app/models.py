@@ -69,7 +69,6 @@ class DoorAccessLog(Base):
 class RoomSensorData(Base):
     __tablename__ = "room_sensor_data"
 
-    # Data is now not related to a room. We should have a construct for rooms
     reading_id = Column(Integer, primary_key=True, index=True)
     humidity = Column(Integer)
     people = Column(Integer)
@@ -86,5 +85,15 @@ class UserConnectionHistory(Base):
     user_id = Column(Integer, ForeignKey("user_accounts.id"), index=True)
     timestamp = Column(DateTime)
     # TODO: add ip
+
+class EmergancyNotice(Base):
+    __tablename__ = "emergency_notice"
+
+    id = Column(Integer, primary_key=True)
+    monitor_id = Column(Integer, ForeignKey("monitors.id"), index=True)
+    people = Column(Integer)
+    temperature = Column(Integer)
+    smoke_sensor_reading = Column(Integer)
+    timestamp = Column(DateTime)
 
 # TODO: Add table to store active sessions. May periodically clear.
