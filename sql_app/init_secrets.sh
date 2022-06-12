@@ -16,3 +16,5 @@ then
     exit 255
 fi
 echo "first_user_pass=$firstpass" >> .env
+
+chmod 600 .env
