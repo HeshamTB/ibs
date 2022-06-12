@@ -66,6 +66,7 @@ def init_allowance():
 
 def init_sensor_data():
     monitor = crud.get_monitor(db, 1)
+    if monitor.sensor_history: return
     for i in range(50):
         room_data = \
             schemas.\
@@ -79,6 +80,7 @@ def init_sensor_data():
     
 def init_open_close_requests():
     user = crud.get_user_by_email(db, "hisham@banafa.com.sa")
+    if user.access_log: return
     crud.set_open_door_request(db, 1, 10)
     log_entry = schemas.DoorAccessLog(user_id=user.id,
                                              iot_id=1,
