@@ -1,4 +1,14 @@
 #!/bin/bash
 
 source venv/bin/activate
+
+cd sql_app/
+
+./file_permissios.py
+if [ $? == 1 ]
+then
+    echo "enviorment file_permissions are incorrect"
+    exit 1
+fi
+cd ../
 exec uvicorn sql_app.main:app --ssl-certfile server.crt --ssl-keyfile server.key --port 4040 --host 0.0.0.0 --no-server-header
