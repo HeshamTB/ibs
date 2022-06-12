@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from . import crud, models, schemas, auth_helper, init_db
 from .database import SessionLocal, engine
-from .utils import get_db, EMERG_SMOKE, EMERG_TEMP
+from .utils import get_db, EMERG_SMOKE, EMERG_TEMP, T_HOUR_SEC
 
 from typing import List
 from datetime import timedelta, datetime
@@ -394,7 +394,7 @@ def polling_method_for_iot_entity(request: schemas.IotDoorPollingRequest,
 @app.post("/iotdevice/monitor/status", tags=['Iot'])
 def polling_method_for_room_monitor(request: schemas.MonitorUpdateReadings,
                                     db: Session = Depends(get_db)):
-    device : schemas.Monitor = auth_helper.valid_monitor_token(request.token, db)
+    device : models.Monitors = auth_helper.valid_monitor_token(request.token, db)
     if not device:
         raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -402,7 +402,8 @@ def polling_method_for_room_monitor(request: schemas.MonitorUpdateReadings,
     crud.record_room_sensor_data(db, request, device)
     if request.temperature >= EMERG_TEMP or request.smoke_sensor_reading >= EMERG_SMOKE:
         print("********EMERGENCY AT %s********" % device.description)
-        # TODO: Get door, and open
+        door : models.IotEntity = device.door
+        crud.set_open_door_request(db, door.id, T_HOUR_SEC)
         crud.record_emergancy_entry(db, request, device.id)
         # Call into a hook to notify with room and people
         
