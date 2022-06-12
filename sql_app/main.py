@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from . import crud, models, schemas, auth_helper, init_db
 from .database import SessionLocal, engine
-from .utils import get_db, EMERG_SMOKE, EMERG_TEMP, T_HOUR_SEC
+from .utils import get_db, EMERG_SMOKE, EMERG_TEMP, EMERG_OPEN_TIME_SEC
 
 from typing import List
 from datetime import timedelta, datetime
@@ -404,7 +404,7 @@ def polling_method_for_room_monitor(request: schemas.MonitorUpdateReadings,
         print("********EMERGENCY AT %s********" % device.description)
         door : models.IotEntity = device.door
         print("********OPENING DOOR %s ID:%d********" % (door.description, door.id))
-        crud.set_open_door_request(db, door.id, T_HOUR_SEC)
+        crud.set_open_door_request(db, door.id, EMERG_OPEN_TIME_SEC)
         crud.record_emergancy_entry(db, request, device.id)
         # Call into a hook to notify with room and people
         
