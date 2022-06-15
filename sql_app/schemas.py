@@ -1,3 +1,6 @@
+# March 2022
+# Hesham T. Banafa <hishaminv@gmail.com>
+
 from typing import Any, List, Optional
 
 from pydantic import BaseModel

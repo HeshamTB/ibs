@@ -1,3 +1,6 @@
+# March 2022
+# Hesham T. Banafa <hishaminv@gmail.com>
+
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 

@@ -1,3 +1,5 @@
+# March 2022
+# Hesham T. Banafa <hishaminv@gmail.com>
 
 import os
 from hashlib import pbkdf2_hmac

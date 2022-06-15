@@ -1,3 +1,6 @@
+# March 2022
+# Hesham T. Banafa <hishaminv@gmail.com>
+
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, OAuth2AuthorizationCodeBearer
 from fastapi.security.api_key import APIKey

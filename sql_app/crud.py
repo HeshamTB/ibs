@@ -1,3 +1,6 @@
+# March 2022
+# Hesham T. Banafa <hishaminv@gmail.com>
+
 # CRUD (Create, Read, Update, Delete) from db
 
 from sqlalchemy import select, join

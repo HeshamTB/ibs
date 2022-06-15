@@ -15,7 +15,7 @@
 - [X] Expose data analysis
 - [X] Load backend onto RPi
 - [X] Test connections in lab network
-- [ ] Define emrgancy triggers (manual and automatic)
+- [X] Define emrgancy triggers (manual and automatic)
 - [ ] Expose temporary control in case of emergancy
         - Triggers
         - Acccess
@@ -36,6 +36,10 @@
 - [ ] Write unit tests
 - [ ] Develop a program to visualize the data
 - [ ] CLI frontend
-
-
+- [X] Emergaency
+- [X] Send state with accesslist
+- [X] Split monitor into different class
+- [ ] Make a script that adds types, and thier basic database ops?? (avoid writing boiler-plate)
+- [ ] Make a script that emulates a door and monitor
+- [ ] Check file premissions on .env file, if global reject
 eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJibHVldG9vdGhfbWFjIjoic3RyaW5nIn0.ELl5AfBR1NdM4_OFhl_SCTm9EMPpqjiCKOSS0CrOJps
